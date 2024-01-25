@@ -1,0 +1,9 @@
+[gd_scene load_steps=2 format=3 uid="uid://duvoqu6yn558s"]
+
+[ext_resource type="Script" path="res://addons/simple_message_spawner/sms_message_spawner.gd" id="1_r6nhn"]
+
+[node name="NotificationSpawner" type="CanvasLayer"]
+script = ExtResource("1_r6nhn")
+message_screen_position = 1
+message_source_direction = 3
+message_exit_direction = 4

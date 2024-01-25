@@ -1,0 +1,15 @@
+ea4bc82a6ad023ab7ee23ee620429895
+::res://::1706183463
+icon.svg::CompressedTexture2D::8386100767944705208::1705734510::1705734515::1::::<><>::
+::res://addons/::1706081538
+::res://addons/simple_message_spawner/::1706168106
+sms_message.gd::GDScript::-1::1706168105::0::1::::SMSMessage<>PanelContainer<>::
+sms_message.tscn::PackedScene::4898879174628008149::1706168106::0::1::::<><>::res://addons/simple_message_spawner/sms_message.gd<>res://addons/simple_message_spawner/resources/sms_message_move_config.gd
+sms_message_spawner.gd::GDScript::-1::1706119843::0::1::::SMSMessageSpawner<>CanvasLayer<>::
+sms_message_spawner.tscn::PackedScene::8607270566741392236::1706168105::0::1::::<><>::res://addons/simple_message_spawner/sms_message_spawner.gd
+::res://addons/simple_message_spawner/resources/::1706082905
+sms_message_move_config.gd::GDScript::-1::1706082905::0::1::::SMSMessageMoveConfig<>Resource<>::
+::res://GodotUtils-SimpleMessageSpawner/::1706183321
+::res://scenes/::1706168105
+test_scene.gd::GDScript::-1::1706091151::0::1::::<>Node2D<>::
+test_scene.tscn::PackedScene::2451775339092158483::1706168105::0::1::::<><>::res://scenes/test_scene.gd<>uid://duvoqu6yn558s::::res://addons/simple_message_spawner/sms_message_spawner.tscn
