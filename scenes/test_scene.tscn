@@ -6,4 +6,4 @@
 [node name="TestScene" type="Node2D"]
 script = ExtResource("1_wkgbj")
 
-[node name="NotificationSpawner" parent="." instance=ExtResource("2_gbyod")]
+[node name="MessageSpawner" parent="." instance=ExtResource("2_gbyod")]

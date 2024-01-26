@@ -1,6 +1,6 @@
 extends Node2D
 
-@onready var message_spawner: SMSMessageSpawner = $NotificationSpawner
+@onready var message_spawner: SMSMessageSpawner = $MessageSpawner
 
 # Called when the node enters the scene tree for the first time.
 func _ready():
