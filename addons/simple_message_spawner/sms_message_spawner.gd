@@ -76,6 +76,7 @@ func process_messages() -> void:
 	add_child(sms_message)
 	
 	sms_message.finished_displaying.connect(on_message_finished_displaying.bind(sms_message))
+	sms_message.displaying_paused.connect(on_message_paused_displaying.bind(sms_message))
 	sms_message.set_label_text(message_text)
 	
 	set_anchors(sms_message, message_screen_position)
@@ -259,6 +260,7 @@ func get_message_target_position(message: SMSMessage) -> Vector2:
 # When the message is finished displaying, this gets called to move it off-screen
 # and delete it when it's done
 func on_message_finished_displaying(finished_message: SMSMessage):
+	print("Dealing with message: ", finished_message.get_text())
 	# Need to move message off screen and recalculate the target position
 	# in case it has moved
 	var target_position: Vector2 = get_message_exit_position(finished_message)
@@ -270,15 +272,37 @@ func on_message_finished_displaying(finished_message: SMSMessage):
 	await finished_message.delete_message
 	
 	var count: int = 0
+	
+	# if there are any messages after this message that were paused, we need to move them
+	# down or up by the size of this notification
+	var message_index: int = messages_on_screen.find(finished_message)
+	
+	if message_index > 0:
+		for message in messages_on_screen:
+			if count == message_index:
+				break
+			var new_position := Vector2(message.position.x, message.position.y - finished_message.size.y)
+			message.set_display_config_target_position(new_position)
+			message.move()
+			count += 1
+	
+	
+	
+	count = 0
 	for message in messages_on_screen:
 		if message == finished_message:
 			messages_on_screen
+			print("count: ", count, " Message: ", messages_on_screen[count].get_text())
 			messages_on_screen.remove_at(count)
 			break
 		count += 1	
 	
 	process_messages()
 
+
+func on_message_paused_displaying(paused_message: SMSMessage):
+	print("Message has paused displaying")
+	pass
 
 # Sets the position of the message if it is not set to move from anywhere off-screen
 func set_none_position(message: SMSMessage):

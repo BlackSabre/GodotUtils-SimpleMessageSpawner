@@ -3,6 +3,7 @@ class_name SMSMessage
 
 signal moving_finished
 signal finished_displaying(message: SMSMessage)
+signal displaying_paused(message: SMSMessage)
 signal delete_message
 
 ## Colour of the message panel container when created
@@ -33,6 +34,7 @@ var is_moving: bool = false
 var is_displaying: bool = false
 var mouse_inside: bool = false
 var handling_mouse_click: bool = false
+var pause_displaying: bool = false
 
 func _ready():
 	self_modulate.a = 0
@@ -48,11 +50,24 @@ func _input(event):
 	if handle_mouse_clicks == false:
 		return
 		
-	if event is InputEventMouseButton == true:
-		if (handling_mouse_click == false && event.button_index == MOUSE_BUTTON_LEFT 
-				&& event.pressed == true):
-			handling_mouse_click = true
-			print("Input for message found")
+	if (event is InputEventMouseButton == true && handling_mouse_click == false 
+			&& event.button_index == MOUSE_BUTTON_LEFT && event.pressed == true 
+			&& mouse_inside == true):
+			await get_tree().process_frame
+			handle_mouse_click()
+
+
+func get_text():
+	return message_label.text
+	
+
+func handle_mouse_click():
+	if handling_mouse_click == true:
+		return
+	handling_mouse_click = true
+	await get_tree().create_timer(3).timeout
+	handling_mouse_click = false
+
 
 # sets the text in message_label
 func set_label_text(text: String) -> void:
@@ -89,8 +104,6 @@ func display_message(start_position: Vector2, change_colour: bool):
 	await moving_finished
 	
 	await display()
-	
-	finished_displaying.emit()
 
 
 # Moves this object to the target position in message_config in move_duration seconds
@@ -163,8 +176,11 @@ func display():
 	
 	if is_moving == true:
 		await moving_finished
-		
-	is_displaying = false
+	
+	if pause_displaying == false:
+		print("Emitting finished displaying")
+		finished_displaying.emit()
+		is_displaying = false
 
 
 # Called after a move is finished
@@ -183,9 +199,12 @@ func finish_move_and_delete():
 
 func _on_mouse_entered():
 	mouse_inside = true
+	pause_displaying = true
 	#print("mouse entered")
 
 
 func _on_mouse_exited():
 	mouse_inside = false
+	pause_displaying = false
+	display()
 	#print("mouse exited")
