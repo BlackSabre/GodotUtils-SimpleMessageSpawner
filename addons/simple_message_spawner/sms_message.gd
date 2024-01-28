@@ -36,6 +36,11 @@ var mouse_inside: bool = false
 var handling_mouse_click: bool = false
 var pause_displaying: bool = false
 
+enum move_configs {
+	DISPLAY_CONFIG,
+	EXIT_CONFIG,
+}
+
 func _ready():
 	self_modulate.a = 0
 	message_label.modulate.a = 0
@@ -99,7 +104,7 @@ func display_message(start_position: Vector2, change_colour: bool):
 		self_modulate = start_panel_container_colour
 		message_label.add_theme_color_override("font_color", start_text_colour)		
 	
-	move(change_colour, true, display_message_config)
+	#move(change_colour, true, display_message_config)
 	
 	await moving_finished
 	
@@ -117,8 +122,9 @@ func display_message(start_position: Vector2, change_colour: bool):
 #
 # To wait for the move, use await moving_finished if terminate_after is false
 # To wait for the move and deletion, use await delete_message if terminate_after is true
-func move(change_colour: bool = false, use_tween_transition_and_ease: bool = false,
-		message_config: SMSMessageMoveConfig = display_message_config, terminate_after: bool = false):
+func move(start_position: Vector2, change_colour: bool = false, use_tween_transition_and_ease: bool = false,
+		message_config: SMSMessageMoveConfig = display_message_config, terminate_after: bool = false,
+		use_start_colours: bool = false):
 	if message_config == null:
 		print_debug("Please set the message config object in sms_message.tscn")
 		finish_move()
@@ -161,7 +167,7 @@ func move_and_delete(target_position: Vector2, change_colour: bool):
 		await moving_finished
 	
 	exit_message_config.target_position = target_position
-	move(change_colour, true, exit_message_config, true)
+	#move(change_colour, true, exit_message_config, true)
 	
 	await delete_message
 
