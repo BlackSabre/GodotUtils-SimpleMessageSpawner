@@ -133,6 +133,13 @@ func move(start_position: Vector2, change_colour: bool = false, use_tween_transi
 	if is_moving == true:
 		await moving_finished
 	
+	if use_start_colours:
+		self.position = start_position
+		self_modulate.a = 1
+		message_label.modulate.a = 1
+		self_modulate = start_panel_container_colour
+		message_label.add_theme_color_override("font_color", start_text_colour)	
+		
 	is_moving = true
 	
 	var move_tween: Tween = create_tween()
@@ -204,12 +211,18 @@ func finish_move_and_delete():
 
 
 func _on_mouse_entered():
+	if handling_mouse_click == false:
+		return
+		
 	mouse_inside = true
 	pause_displaying = true
 	#print("mouse entered")
 
 
 func _on_mouse_exited():
+	if handling_mouse_click == false:
+		return
+		
 	mouse_inside = false
 	pause_displaying = false
 	display()

@@ -4,6 +4,9 @@ class_name SMSMessageSpawner
 signal new_message_added_for_processing
 signal all_messages_moved
 signal new_slot_opened
+signal can_move_messages
+signal can_continue_processing
+signal message_finished_displaying
 
 ## Part of screen where message displays
 @export var message_screen_position: MessageScreenPosition = MessageScreenPosition.TOP
@@ -27,6 +30,7 @@ var message_text_queue: Array[String]
 var messages_on_screen: Array[SMSMessage]
 var message_move_array: Array[Callable]
 var is_currently_processing: bool = false
+var messages_moving: bool = false
 
 # Part of screen where the popups display. Didn't bother with left and right 
 # as it doesn't seem like normal behaviour for a message message of this 
@@ -72,6 +76,72 @@ func process_messages() -> void:
 		return
 	
 	is_currently_processing = true
+	
+	var sms_message: SMSMessage = await add_and_configure_message_object()
+	
+	
+	# Move all y position existing messages
+	if messages_on_screen.size() > 0:
+		var move_y_callable: Callable = func(): await move_ys(sms_message)
+		message_move_array.append(move_y_callable)
+		process_message_move_array()		
+		await can_move_messages
+	
+	
+	
+	# Move new message into position
+	var initial_move_callable: Callable = func(): await move_message_initial(sms_message)
+	message_move_array.append(initial_move_callable)
+	process_message_move_array()
+	await can_move_messages
+	
+	
+	# Display
+	var display_move_callable: Callable = func(): await display_message(sms_message)
+	message_move_array.append(display_move_callable)
+	process_message_move_array()
+	
+	print("Finished processing entire message")
+	is_currently_processing = false
+	process_messages()
+
+
+func move_ys(sms_message: SMSMessage):
+	if messages_moving == true:
+		await can_move_messages
+		
+	messages_moving = true
+	print("Moving ys")
+	move_all_messages_y_position(sms_message)
+	await all_messages_moved
+	can_move_messages.emit()
+	messages_moving = false
+
+
+func move_message_initial(sms_message: SMSMessage):
+	if messages_moving == true:
+		await can_move_messages
+	
+	messages_moving = true
+	var start_position: Vector2 = get_message_start_position(sms_message)
+	var target_position: Vector2 = get_message_target_position(sms_message)
+	
+	sms_message.set_display_config_target_position(target_position)
+	await sms_message.move(start_position, true, true, sms_message.display_message_config, false, true)
+	await sms_message.moving_finished
+	messages_on_screen.append(sms_message)
+	can_move_messages.emit()
+	messages_moving = false
+	
+
+
+func display_message(sms_message: SMSMessage):
+	await get_tree().create_timer(sms_message.display_time).timeout
+	print("Finished displaying")
+	on_message_finished_displaying(sms_message)
+
+
+func add_and_configure_message_object() -> SMSMessage:
 	var message_text: String = message_text_queue.pop_front()
 	var sms_message: SMSMessage = message_scene.instantiate()
 	add_child(sms_message)
@@ -85,40 +155,24 @@ func process_messages() -> void:
 	# Need to wait until next frame so tje message size & positions properties are updated
 	await get_tree().process_frame
 	
-	set_none_position(sms_message)
+	set_none_position(sms_message)	
 	sms_message.z_index = -messages_on_screen.size()
 	
-	if messages_on_screen.size() > 0:
-		message_move_array.append(await move_all_messages_y_position(sms_message))
-		#move_all_messages_y_position(sms_message)
-		#await all_messages_moved
-	
-	await process_message_move_array()
-	
-	var start_position: Vector2 = get_message_start_position(sms_message)
-	var target_position: Vector2 = get_message_target_position(sms_message)	
-	sms_message.set_display_config_target_position(target_position)
-	#sms_message.display_message(start_position, true)
-	
-	var callable: Callable = func() : await sms_message.move(start_position, true, true, sms_message.display_message_config, false, true)
-	message_move_array.append(callable)
-	
-	#await sms_message.moving_finished
-	
-	messages_on_screen.append(sms_message)
-	
-	is_currently_processing = false
-	process_message_move_array()
-	process_messages()
+	return sms_message
 
 
 func process_message_move_array() -> void:
 	if message_move_array.size() <= 0:
 		print("No moves to process")
-		return	
+		can_continue_processing.emit()
+		return
 	
 	var move: Callable = message_move_array.pop_front()
+	print("Processing next message move")
 	await move.call()
+	print("Finished message move. Calling again")
+	await process_message_move_array()
+	
 
 # Moves all messages on screen by the y-size of current_message
 func move_all_messages_y_position(current_message: SMSMessage):	
@@ -139,6 +193,7 @@ func move_all_messages_y_position(current_message: SMSMessage):
 		message.move(message.position)
 	
 	await messages_on_screen[messages_on_screen.size() - 1].moving_finished
+	
 	all_messages_moved.emit()
 
 
@@ -276,58 +331,59 @@ func get_message_target_position(message: SMSMessage) -> Vector2:
 # and delete it when it's done
 func on_message_finished_displaying(finished_message: SMSMessage):
 	print("Dealing with message: ", finished_message.get_text())
-	# Need to move message off screen and recalculate the target position
-	# in case it has moved
-	var target_position: Vector2 = get_message_exit_position(finished_message)
-	
-	# ensure the message displays behind other messages on screen
-	finished_message.z_index = -max_messages_on_screen
-	finished_message.move_and_delete(target_position, true)
-	
-	await finished_message.delete_message
-	
-	var count: int = 0
-	
-	# if there are any messages after this message that were paused, we need to move them
-	# down or up by the size of this notification
-	var message_index: int = messages_on_screen.find(finished_message)
-	
-	for message in messages_on_screen:
-		if count > message_index:
-			break
-		
-		if message.has_signal("is_moving") && message.is_moving:
-			await message.moving_finished
-			#on_message_finished_displaying(finished_message)
-			return
-		
-		count += 1
-	
-	count = 0
-	if message_index > 0:
-		for message in messages_on_screen:
-			if count == message_index:
-				break 
-			var new_position := Vector2(message.position.x, message.position.y - finished_message.size.y)
-			message.set_display_config_target_position(new_position)
-			message.move(message.position)
-			count += 1
-	
-	count = 0
-	for message in messages_on_screen:
-		if message == finished_message:
-			messages_on_screen
-			print("count: ", count, " Message: ", messages_on_screen[count].get_text())
-			messages_on_screen.remove_at(count)
-			break
-		count += 1	
-	
-	process_messages()
+	## Need to move message off screen and recalculate the target position
+	## in case it has moved
+	#var target_position: Vector2 = get_message_exit_position(finished_message)
+	#
+	## ensure the message displays behind other messages on screen
+	#finished_message.z_index = -max_messages_on_screen
+	#finished_message.move_and_delete(target_position, true)
+	#
+	#await finished_message.delete_message
+	#
+	#var count: int = 0
+	#
+	## if there are any messages after this message that were paused, we need to move them
+	## down or up by the size of this notification
+	#var message_index: int = messages_on_screen.find(finished_message)
+	#
+	#for message in messages_on_screen:
+		#if count > message_index:
+			#break
+		#
+		#if message.has_signal("is_moving") && message.is_moving:
+			#await message.moving_finished
+			##on_message_finished_displaying(finished_message)
+			#return
+		#
+		#count += 1
+	#
+	#count = 0
+	#if message_index > 0:
+		#for message in messages_on_screen:
+			#if count == message_index:
+				#break 
+			#var new_position := Vector2(message.position.x, message.position.y - finished_message.size.y)
+			#message.set_display_config_target_position(new_position)
+			#message.move(message.position)
+			#count += 1
+	#
+	#count = 0
+	#for message in messages_on_screen:
+		#if message == finished_message:
+			#messages_on_screen
+			#print("count: ", count, " Message: ", messages_on_screen[count].get_text())
+			#messages_on_screen.remove_at(count)
+			#break
+		#count += 1	
+	#
+	#process_messages()
 
 
 func on_message_paused_displaying(paused_message: SMSMessage):
 	print("Message has paused displaying")
 	pass
+
 
 # Sets the position of the message if it is not set to move from anywhere off-screen
 func set_none_position(message: SMSMessage):

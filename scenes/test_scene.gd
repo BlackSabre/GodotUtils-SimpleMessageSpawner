@@ -18,7 +18,7 @@ func _ready():
 	
 	message_spawner.add_message("5. This is a message")
 	message_spawner.add_message("6. This is a message")
-	message_spawner.add_message("7. This is a message")
+	message_spawner.add_message("7. This is another annoying message! This is an annoying message! This is an annoying message! This is another annoying message! This is an annoying message! This is an annoying message!")
 	message_spawner.add_message("8. This is a message")
 	message_spawner.add_message("9. This is a message")
 	message_spawner.add_message("10. This is a message")
