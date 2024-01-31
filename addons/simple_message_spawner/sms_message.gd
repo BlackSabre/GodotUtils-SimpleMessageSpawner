@@ -174,7 +174,7 @@ func move_and_delete(target_position: Vector2, change_colour: bool):
 		await moving_finished
 	
 	exit_message_config.target_position = target_position
-	#move(change_colour, true, exit_message_config, true)
+	move(position, true, true, exit_message_config, true, false)
 	
 	await delete_message
 
@@ -204,7 +204,7 @@ func finish_move():
 
 # Called after a move and when it's set to delete
 func finish_move_and_delete():
-	is_moving = false
+	is_moving = false	
 	moving_finished.emit()
 	delete_message.emit()
 	queue_free()
