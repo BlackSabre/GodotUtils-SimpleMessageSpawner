@@ -12,6 +12,7 @@ signal message_finished_displaying
 signal finished_initial_move
 signal finished_y_moves
 signal finished_moving_off_screen
+signal finished_reordering_messages_on_screen
 
 
 ## Part of screen where message displays
@@ -37,6 +38,7 @@ var messages_on_screen: Array[SMSMessage]
 var message_move_array: Array[Callable]
 var is_currently_processing: bool = false
 var messages_moving: bool = false
+var reordering_messages: bool = false
 
 # Part of screen where the popups display. Didn't bother with left and right 
 # as it doesn't seem like normal behaviour for a message message of this 
@@ -91,6 +93,9 @@ func process_messages() -> void:
 		process_messages()
 		return
 	
+	if reordering_messages == true:
+		await finished_reordering_messages_on_screen
+	
 	is_currently_processing = true
 	
 	var sms_message: SMSMessage = await add_and_configure_message_object()
@@ -119,7 +124,7 @@ func process_messages() -> void:
 	var display_move_callable: Callable = func(): await display_message(sms_message)
 	message_move_array.append(display_move_callable)	
 	
-	print("Finished processing entire message")
+	#print("Finished processing entire message")
 	is_currently_processing = false
 	process_move_array_and_messages()
 
@@ -130,6 +135,9 @@ func move_ys(sms_message: SMSMessage):
 	
 	if messages_moving == true:
 		await can_move_messages
+	
+	if reordering_messages == true:
+		await finished_reordering_messages_on_screen
 		
 	messages_moving = true
 	#print("Moving ys")
@@ -170,7 +178,11 @@ func display_message(sms_message: SMSMessage):
 		return
 	
 	await get_tree().create_timer(sms_message.display_time).timeout
-	#print("Finished displaying")
+	print("Finished displaying")
+	
+	if sms_message == null: 
+		return
+	
 	on_message_finished_displaying(sms_message)
 
 
@@ -182,15 +194,19 @@ func move_message_off_screen(sms_message: SMSMessage):
 		await can_move_messages
 	
 	messages_moving = true
+	var message_index: int = messages_on_screen.find(sms_message)
+	var message_size_y: float = sms_message.size.y
+	
 	sms_message.set_exit_config_target_position(get_message_exit_position(sms_message))
-	
-	#await sms_message.move(sms_message.position, true, true, sms_message.exit_message_config, false, true)
-	
 	sms_message.move_and_delete(get_message_exit_position(sms_message), true)
 	await sms_message.delete_message
+	messages_on_screen.remove_at(message_index)	
 	
-	var message_index: int = messages_on_screen.find(sms_message)
-	messages_on_screen.remove_at(message_index)
+	if message_index > 0:
+		print("we need to move")
+		reorder_messages(message_size_y, message_index)
+		await finished_reordering_messages_on_screen
+	
 	
 	can_move_messages.emit()
 	messages_moving = false
@@ -210,7 +226,7 @@ func add_and_configure_message_object() -> SMSMessage:
 	add_child(sms_message)
 	
 	sms_message.finished_displaying.connect(on_message_finished_displaying.bind(sms_message))
-	sms_message.displaying_paused.connect(on_message_paused_displaying.bind(sms_message))
+	sms_message.resume_displaying.connect(on_message_display_resume.bind(sms_message))
 	sms_message.set_label_text(message_text)
 	
 	set_anchors(sms_message, message_screen_position)
@@ -222,6 +238,11 @@ func add_and_configure_message_object() -> SMSMessage:
 	sms_message.z_index = -messages_on_screen.size()
 	
 	return sms_message
+
+
+func on_message_display_resume(message: SMSMessage):
+	print("Resuming message")
+	display_message(message)
 
 
 func process_message_move_array() -> void:
@@ -398,14 +419,39 @@ func get_message_target_position(message: SMSMessage) -> Vector2:
 # When the message is finished displaying, this gets called to move it off-screen
 # and delete it when it's done
 func on_message_finished_displaying(finished_message: SMSMessage):
-	# append move off-screen movement	
-	var move_off_callable : Callable = func() : await move_message_off_screen(finished_message)
+	print("Message needs to go. Check if paused.")
+	if finished_message.pause_displaying == true:
+		print("Message paused. Returning")
+		return
+	
+	# append move off-screen movement
+	var move_off_callable: Callable = func(): await move_message_off_screen(finished_message)
 	message_move_array.append(move_off_callable)
+	process_message_move_array()
 
 
-func on_message_paused_displaying(paused_message: SMSMessage):
-	print("Message has paused displaying")
-	pass
+func reorder_messages(move_amount_y: float, message_index: int):
+	print("Reordering messages. message_index: ", message_index)	
+	reordering_messages = true
+	if message_screen_position == MessageScreenPosition.TOP:
+		move_amount_y = -move_amount_y
+	
+	for index: int in message_index:
+		print("index: ", index)
+		var message: SMSMessage = messages_on_screen[index]
+		
+		if message == null:
+			continue
+			
+		var target_position := Vector2(message.position.x, message.position.y + move_amount_y)
+		
+		message.set_display_config_target_position(target_position)
+		message.move(message.position)
+		
+	await messages_on_screen[message_index - 1].moving_finished
+	
+	finished_reordering_messages_on_screen.emit()
+	reordering_messages = false
 
 
 # Sets the position of the message if it is not set to move from anywhere off-screen

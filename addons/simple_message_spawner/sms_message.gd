@@ -5,6 +5,7 @@ signal moving_finished
 signal finished_displaying(message: SMSMessage)
 signal displaying_paused(message: SMSMessage)
 signal delete_message
+signal resume_displaying(message: SMSMessage)
 
 ## Colour of the message panel container when created
 @export var start_panel_container_colour: Color
@@ -25,7 +26,7 @@ signal delete_message
 @export var display_time: float
 
 ## Whether this object intercepts mouse clicks
-@export var handle_mouse_clicks: bool = false
+@export var handle_mouse_clicks: bool
 
 @onready var message_label: Label = $MessageMarginContainer/MessageLabel
 @onready var message_sound: AudioStreamPlayer = $MessageSound
@@ -46,9 +47,9 @@ func _ready():
 	message_label.modulate.a = 0
 	
 	if handle_mouse_clicks == true:
-		mouse_filter == MOUSE_FILTER_STOP
+		mouse_filter = MOUSE_FILTER_STOP
 	else:
-		mouse_filter == MOUSE_FILTER_IGNORE
+		mouse_filter = MOUSE_FILTER_IGNORE
 
 
 func _input(event):
@@ -170,10 +171,13 @@ func move(start_position: Vector2, change_colour: bool = false, use_tween_transi
 # moves this object to the target position using exit_message_config and deletes it 
 # afterwards
 func move_and_delete(target_position: Vector2, change_colour: bool):
+	#print("In Message: Move and delete")
 	if is_moving == true:
 		await moving_finished
 	
+	
 	exit_message_config.target_position = target_position
+	#print("In Message: Move!!!!")
 	move(position, true, true, exit_message_config, true, false)
 	
 	await delete_message
@@ -204,26 +208,25 @@ func finish_move():
 
 # Called after a move and when it's set to delete
 func finish_move_and_delete():
-	is_moving = false	
+	print("Moving finished. Deleting")
+	is_moving = false
 	moving_finished.emit()
 	delete_message.emit()
 	queue_free()
 
 
 func _on_mouse_entered():
-	if handling_mouse_click == false:
+	if handle_mouse_clicks == false || is_moving == true:
 		return
 		
 	mouse_inside = true
 	pause_displaying = true
-	#print("mouse entered")
 
 
 func _on_mouse_exited():
-	if handling_mouse_click == false:
+	if handle_mouse_clicks == false || is_moving == true:
 		return
 		
 	mouse_inside = false
 	pause_displaying = false
-	display()
-	#print("mouse exited")
+	resume_displaying.emit()
