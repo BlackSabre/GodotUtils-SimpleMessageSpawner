@@ -216,7 +216,7 @@ func finish_move_and_delete():
 
 
 func _on_mouse_entered():
-	if handle_mouse_clicks == false || is_moving == true:
+	if handle_mouse_clicks == false:
 		return
 		
 	mouse_inside = true
