@@ -455,7 +455,7 @@ func on_message_finished_displaying(finished_message: SMSMessage):
 	var move_off_screen_action := SMSMessageAction.new()
 	move_off_screen_action.set_message(finished_message)
 	move_off_screen_action.set_action(func(): await move_message_off_screen(finished_message))
-	move_off_screen_action.set_action_type(SMSMessageAction.ActionType.FINISHING_MOVE)
+	move_off_screen_action.set_acion_type(SMSMessageAction.ActionType.FINISHING_MOVE)
 	message_move_array.append(move_off_screen_action)
 	process_message_move_array()
 
