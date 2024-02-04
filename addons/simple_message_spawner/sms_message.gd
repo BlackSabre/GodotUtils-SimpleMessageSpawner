@@ -37,6 +37,9 @@ var mouse_inside: bool = false
 var handling_mouse_click: bool = false
 var pause_displaying: bool = false
 
+
+var display_timer: Timer
+
 enum move_configs {
 	DISPLAY_CONFIG,
 	EXIT_CONFIG,
@@ -46,11 +49,20 @@ func _ready():
 	self_modulate.a = 0
 	message_label.modulate.a = 0
 	
+	display_timer = Timer.new()
+	add_child(display_timer)
+	display_timer.stop()
+	display_timer.autostart = false
+	display_timer.one_shot = true
+	display_timer.wait_time = display_time
+	display_timer.timeout.connect(on_display_message_finished)
+	
 	if handle_mouse_clicks == true:
 		mouse_filter = MOUSE_FILTER_STOP
 	else:
 		mouse_filter = MOUSE_FILTER_IGNORE
-
+	
+	
 
 func _input(event):
 	if handle_mouse_clicks == false:
@@ -70,6 +82,7 @@ func get_text():
 func handle_mouse_click():
 	if handling_mouse_click == true:
 		return
+	
 	handling_mouse_click = true
 	await get_tree().create_timer(3).timeout
 	handling_mouse_click = false
@@ -101,15 +114,10 @@ func display_message(start_position: Vector2, change_colour: bool):
 	if message_sound != null:
 		message_sound.play()
 	
-	if change_colour:
-		self_modulate = start_panel_container_colour
-		message_label.add_theme_color_override("font_color", start_text_colour)		
-	
-	#move(change_colour, true, display_message_config)
-	
-	await moving_finished
-	
-	await display()
+	display_timer.start(display_time)
+
+func on_display_message_finished():
+	finished_displaying.emit()
 
 
 # Moves this object to the target position in message_config in move_duration seconds
@@ -191,11 +199,11 @@ func display():
 	
 	await get_tree().create_timer(display_time).timeout
 	
-	if is_moving == true:
-		await moving_finished
+	#if is_moving == true:
+		#await moving_finished
 	
 	if pause_displaying == false:
-		print("Emitting finished displaying")
+		#print("Emitting finished displaying")
 		finished_displaying.emit()
 		is_displaying = false
 
@@ -208,17 +216,19 @@ func finish_move():
 
 # Called after a move and when it's set to delete
 func finish_move_and_delete():
-	print("Moving finished. Deleting")
+	#print("Moving finished. Deleting")
 	is_moving = false
 	moving_finished.emit()
 	delete_message.emit()
-	queue_free()
+	handling_mouse_click = false
+	#queue_free()
 
 
 func _on_mouse_entered():
 	if handle_mouse_clicks == false:
 		return
-		
+	
+	display_timer.stop()
 	mouse_inside = true
 	pause_displaying = true
 
@@ -228,5 +238,4 @@ func _on_mouse_exited():
 		return
 		
 	mouse_inside = false
-	pause_displaying = false
-	resume_displaying.emit()
+	display_timer.start(display_time)
