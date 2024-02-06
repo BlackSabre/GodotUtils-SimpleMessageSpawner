@@ -9,9 +9,12 @@ enum ActionType {
 	INITIAL_MOVE,
 	Y_MOVE,
 	DISPLAY,
+	INITIAL_REORDER_MOVE,
 	REORDER_MOVE,
 	FINISHING_MOVE,
-	PROCESS_ALL,
+	INITIAL_PROCESS_MESSAGES,
+	MESSAGE_DELETE,
+	PROCESS_MESSAGES,
 }
 
 func get_action_type() -> ActionType:
@@ -40,9 +43,14 @@ func run_action():
 		print_debug("Please set the action before attempting to run the action")
 		return
 	
-	print("Performing action: ", get_action_type_string(), " for message: ", message.get_text())
+	var message_text: String = "NoMessage"
+	
+	if message != null:
+		message_text = message.get_text()
+	
+	print("Performing action: ", get_action_type_string(), " for message: ", message_text, " Time: ", Time.get_time_dict_from_system())
 	await action.call()
-	print("Finished action: ", get_action_type_string(), " for message: ", message.get_text())
+	print("Finished action: ", get_action_type_string(), " for message: ", message_text, " Time: ", Time.get_time_dict_from_system())
 
 func get_action_type_string() -> String:
 	return ActionType.keys()[action_type]

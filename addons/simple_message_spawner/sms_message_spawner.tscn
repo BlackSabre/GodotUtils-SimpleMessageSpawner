@@ -6,4 +6,3 @@
 script = ExtResource("1_r6nhn")
 message_source_direction = 4
 message_exit_direction = 3
-max_messages_on_screen = 4

@@ -36,7 +36,7 @@ var is_displaying: bool = false
 var mouse_inside: bool = false
 var handling_mouse_click: bool = false
 var pause_displaying: bool = false
-
+var text: String
 
 var display_timer: Timer
 
@@ -51,10 +51,10 @@ func _ready():
 	
 	display_timer = Timer.new()
 	add_child(display_timer)
-	display_timer.stop()
 	display_timer.autostart = false
 	display_timer.one_shot = true
 	display_timer.wait_time = display_time
+	display_timer.stop()
 	display_timer.timeout.connect(on_display_message_finished)
 	
 	if handle_mouse_clicks == true:
@@ -89,8 +89,10 @@ func handle_mouse_click():
 
 
 # sets the text in message_label
-func set_label_text(text: String) -> void:
-	message_label.text = text
+func set_label_text(new_text: String) -> void:
+	self.text = new_text
+	message_label.text = new_text
+	name = "PC_" + new_text
 
 
 # sets the target_position in display_message_config
@@ -116,7 +118,9 @@ func display_message(start_position: Vector2, change_colour: bool):
 	
 	display_timer.start(display_time)
 
+
 func on_display_message_finished():
+	print("SMS_Message: Message: ", text, " finished displaying.")
 	finished_displaying.emit()
 
 
@@ -228,6 +232,9 @@ func _on_mouse_entered():
 	if handle_mouse_clicks == false:
 		return
 	
+	if check_mouse_cursor_in_viewport() == false:
+		return
+	
 	display_timer.stop()
 	mouse_inside = true
 	pause_displaying = true
@@ -239,3 +246,20 @@ func _on_mouse_exited():
 		
 	mouse_inside = false
 	display_timer.start(display_time)
+
+
+func check_mouse_cursor_in_viewport():
+	var mouse_coordinates: Vector2 = get_viewport().get_mouse_position()
+	var viewport_rect: Rect2 = get_viewport_rect()
+	#print("Mouse coordinates: ", mouse_coordinates)
+	#print("viewport rect: ", viewport_rect)
+	
+	if mouse_coordinates.x < 0 || mouse_coordinates.x > viewport_rect.size.x:
+		#print("X is out of bounds")
+		return false
+	elif mouse_coordinates.y < 0 || mouse_coordinates.y > viewport_rect.size.y:
+		return false
+		#print("Y is out of bounds")
+	
+	return true
+	
