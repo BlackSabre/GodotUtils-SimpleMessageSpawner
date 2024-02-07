@@ -29,6 +29,7 @@ var is_processing_message_text_queue: bool = false
 var is_processing_message_move_array: bool = false
 var is_doing_message_initial_move: bool = false
 var is_reordering_messages: bool = false
+var is_moving_message_off_screen: bool = false
 
 # Part of screen where the popups display. Didn't bother with left and right 
 # as it doesn't seem like normal behaviour for a message message of this 
@@ -128,7 +129,7 @@ func add_and_configure_message_object() -> SMSMessage:
 	await get_tree().process_frame
 	print("AACMO: Finished getting and configuring new message. Message: ", message.get_text())
 	return message
-	
+
 
 func move_message_initial(message: SMSMessage):
 	print("MMI: Doing initial move for message: ", message.get_text())
@@ -161,7 +162,25 @@ func display_message(message: SMSMessage):
 
 
 func move_message_off_screen(message: SMSMessage):
-	pass
+	print("MMOS: Moving message off screen: ", message.get_text())
+	#if message == null: 
+		#return
+		
+	is_moving_message_off_screen = true
+	
+	var message_size_y: float = message.size.y	
+	
+	message.set_exit_config_target_position(get_message_exit_position(message))	
+	message.move_and_delete(get_message_exit_position(message), true)
+	
+	await message.delete_message
+	
+	var message_index: int = messages_on_screen.find(message)
+	if message_index >= 0:
+		messages_on_screen.remove_at(message_index)
+	
+	is_moving_message_off_screen = false
+	print("MMOS: Finished moving message off screen: ", message.get_text())
 
 
 func reorder_on_screen_messages(message: SMSMessage):
@@ -237,22 +256,28 @@ func initial_reorder_on_screen_messages(message: SMSMessage):
 	is_reordering_messages = false
 
 
-
 func delete_message(message: SMSMessage):
-	
+	#message.queue_free()
 	pass
 
 
 func on_message_finished_displaying(message: SMSMessage):
 	print("OMFD: Message: ", message.get_text(), " has finished displaying.")
 	
-	add_to_message_action_array(func(): move_message_off_screen(message), SMSMessageAction.ActionType.FINISHING_MOVE, message)
+	add_to_message_action_array(func(): await move_message_off_screen(message), SMSMessageAction.ActionType.FINISHING_MOVE, message)
 	await process_message_move_array()
 	
-	add_to_message_action_array(func(): reorder_on_screen_messages(message), SMSMessageAction.ActionType.REORDER_MOVE, message)
+	print("OMFD: Message: ", message.get_text(), " has finished moving. Reordering...")
+	
+	add_to_message_action_array(func(): await reorder_on_screen_messages(message), SMSMessageAction.ActionType.REORDER_MOVE, message)
 	await process_message_move_array()
 	
-	add_to_message_action_array(func(): delete_message(message), SMSMessageAction.ActionType.MESSAGE_DELETE, message)	
+	print("OMFD: Message: ", message.get_text(), " has finished moving and reordering. Deleting...")
+	
+	add_to_message_action_array(func(): await delete_message(message), SMSMessageAction.ActionType.MESSAGE_DELETE, message)	
+	await process_message_move_array()
+	
+	add_to_message_action_array(func(): await process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
 	await process_message_move_array()
 
 
