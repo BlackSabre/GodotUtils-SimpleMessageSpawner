@@ -93,7 +93,7 @@ func process_messages():
 	var message: SMSMessage = await add_and_configure_message_object()
 	
 	add_to_message_action_array(func(): await initial_reorder_on_screen_messages(message), SMSMessageAction.ActionType.INITIAL_REORDER_MOVE, message)
-	await process_message_move_array()	
+	await process_message_move_array()
 	
 	add_to_message_action_array(func(): await move_message_initial(message), SMSMessageAction.ActionType.INITIAL_MOVE, message)
 	await process_message_move_array()
@@ -105,7 +105,7 @@ func process_messages():
 	is_processing_message_text_queue = false
 	
 	#print("PM: Appending process all messages again after message: ", message.get_text())
-	add_to_message_action_array(func(): await process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
+	add_to_message_action_array(func(): process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
 	await process_message_move_array()
 
 
@@ -137,7 +137,16 @@ func move_message_initial(message: SMSMessage):
 	if is_doing_message_initial_move == true:
 		print("ALREADY DOING MESSAGE INITIAL MOVE: ", message.get_text())
 		return
+	
+	if messages_on_screen.size() >= max_messages_on_screen:
+		add_to_message_action_array(func(): await initial_reorder_on_screen_messages(message), SMSMessageAction.ActionType.INITIAL_REORDER_MOVE, message)
 		
+		add_to_message_action_array(func(): await move_message_initial(message), SMSMessageAction.ActionType.INITIAL_MOVE, message)
+		
+		add_to_message_action_array(func(): await display_message(message), SMSMessageAction.ActionType.DISPLAY, message)
+		
+		return
+	
 	is_doing_message_initial_move = true
 	message.z_index = -1
 	var start_position: Vector2 = get_message_start_position(message)
@@ -162,9 +171,7 @@ func display_message(message: SMSMessage):
 
 
 func move_message_off_screen(message: SMSMessage):
-	print("MMOS: Moving message off screen: ", message.get_text())
-	#if message == null: 
-		#return
+	print("MMOS: Moving message off screen: ", message.get_text())	
 		
 	is_moving_message_off_screen = true
 	
@@ -277,7 +284,7 @@ func on_message_finished_displaying(message: SMSMessage):
 	add_to_message_action_array(func(): await delete_message(message), SMSMessageAction.ActionType.MESSAGE_DELETE, message)	
 	await process_message_move_array()
 	
-	add_to_message_action_array(func(): await process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
+	add_to_message_action_array(func(): process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
 	await process_message_move_array()
 
 

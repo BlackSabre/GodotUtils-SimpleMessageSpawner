@@ -39,6 +39,7 @@ var pause_displaying: bool = false
 var text: String
 
 var display_timer: Timer
+var test_orig_colour: Color
 
 enum move_configs {
 	DISPLAY_CONFIG,
@@ -235,6 +236,8 @@ func _on_mouse_entered():
 	if check_mouse_cursor_in_viewport() == false:
 		return
 	
+	test_orig_colour = modulate
+	modulate = Color.CHARTREUSE
 	display_timer.stop()
 	mouse_inside = true
 	pause_displaying = true
@@ -244,7 +247,8 @@ func _on_mouse_exited():
 	if handle_mouse_clicks == false || is_moving == true:
 		return
 		
-	mouse_inside = false
+	mouse_inside = false	
+	modulate = test_orig_colour
 	display_timer.start(display_time)
 
 
