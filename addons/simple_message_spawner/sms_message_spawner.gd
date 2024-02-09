@@ -49,7 +49,7 @@ enum MessageMoveDirection {
 }
 
 
-func add_message(message_string: String):
+func add_message(message_string: String):	
 	message_text_queue.append(message_string)
 	
 	print("AM: New string: ", message_string, " received. Appending to message_move_array.")	
@@ -92,6 +92,9 @@ func process_messages():
 	
 	var message: SMSMessage = await add_and_configure_message_object()
 	
+	if message == null:
+		return
+	
 	add_to_message_action_array(func(): await initial_reorder_on_screen_messages(message), SMSMessageAction.ActionType.INITIAL_REORDER_MOVE, message)
 	await process_message_move_array()
 	
@@ -110,7 +113,9 @@ func process_messages():
 
 
 func add_and_configure_message_object() -> SMSMessage:
+	await get_tree().process_frame
 	print("AACMO: Getting and configuring new message")
+		
 	var message_text: String = message_text_queue.pop_front()
 	var message: SMSMessage = message_scene.instantiate()
 	add_child(message)
@@ -137,16 +142,7 @@ func move_message_initial(message: SMSMessage):
 	if is_doing_message_initial_move == true:
 		print("ALREADY DOING MESSAGE INITIAL MOVE: ", message.get_text())
 		return
-	
-	if messages_on_screen.size() >= max_messages_on_screen:
-		add_to_message_action_array(func(): await initial_reorder_on_screen_messages(message), SMSMessageAction.ActionType.INITIAL_REORDER_MOVE, message)
 		
-		add_to_message_action_array(func(): await move_message_initial(message), SMSMessageAction.ActionType.INITIAL_MOVE, message)
-		
-		add_to_message_action_array(func(): await display_message(message), SMSMessageAction.ActionType.DISPLAY, message)
-		
-		return
-	
 	is_doing_message_initial_move = true
 	message.z_index = -1
 	var start_position: Vector2 = get_message_start_position(message)

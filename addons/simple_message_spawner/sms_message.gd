@@ -110,6 +110,9 @@ func set_exit_config_target_position(target_position: Vector2):
 # off screen and deleting it. I tried to do this all here, but if the position changes,
 # the position off screen has to be recalculated, which is done on the sms_message_spawner
 func display_message(start_position: Vector2, change_colour: bool):
+	if is_moving == true:
+		await moving_finished
+		
 	self.position = start_position
 	self_modulate.a = 1
 	message_label.modulate.a = 1
