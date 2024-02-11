@@ -52,6 +52,9 @@ enum MessageMoveDirection {
 func add_message(message_string: String):	
 	message_text_queue.append(message_string)
 	
+	if messages_on_screen.size() >= max_messages_on_screen:
+		return
+	
 	print("AM: New string: ", message_string, " received. Appending to message_move_array.")	
 	add_to_message_action_array(func(): process_messages(), SMSMessageAction.ActionType.INITIAL_PROCESS_MESSAGES)
 	
@@ -59,6 +62,7 @@ func add_message(message_string: String):
 
 
 func process_message_move_array():
+	get_tree().process_frame
 	if message_action_array.size() <= 0:
 		print("No message moves to process")
 		return
@@ -69,7 +73,14 @@ func process_message_move_array():
 	is_processing_message_move_array = true
 	var message_action: SMSMessageAction = message_action_array.pop_front()
 	
-	print("PMMA: Processing new action")	
+	print("PMMA: Processing new action")
+	print("PMMA: Messages on screen size: ", messages_on_screen.size())
+	
+	if (message_action.get_action_type() == SMSMessageAction.ActionType.INITIAL_MOVE &&
+			messages_on_screen.size() >= max_messages_on_screen):
+		print("PMMA: Aborting new action")
+		process_message_move_array()
+	
 	await message_action.run_action()
 	print("PMMA: Finished processing new action")
 	
@@ -141,6 +152,9 @@ func move_message_initial(message: SMSMessage):
 	
 	if is_doing_message_initial_move == true:
 		print("ALREADY DOING MESSAGE INITIAL MOVE: ", message.get_text())
+		return
+	
+	if messages_on_screen.size() >= max_messages_on_screen - 1:
 		return
 		
 	is_doing_message_initial_move = true
