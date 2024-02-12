@@ -8,8 +8,8 @@
 script = ExtResource("2_g5dls")
 to_panel_container_colour = Color(0, 0, 1, 1)
 to_text_colour = Color(1, 1, 1, 1)
-change_duration = 1.0
-move_duration = 1.0
+change_duration = 0.3
+move_duration = 0.3
 move_tween_transition_type = 7
 move_tween_ease_type = 0
 change_tween_transition_type = 0
@@ -19,8 +19,8 @@ change_tween_ease_type = 0
 script = ExtResource("2_g5dls")
 to_panel_container_colour = Color(1, 1, 1, 0)
 to_text_colour = Color(1, 1, 1, 0)
-change_duration = 1.0
-move_duration = 1.0
+change_duration = 0.3
+move_duration = 0.3
 move_tween_transition_type = 7
 move_tween_ease_type = 0
 change_tween_transition_type = 0
@@ -38,7 +38,7 @@ start_panel_container_colour = Color(0, 0, 0.945098, 0)
 start_text_colour = Color(0.745098, 0.745098, 0.745098, 0)
 display_message_config = SubResource("Resource_i1up0")
 exit_message_config = SubResource("Resource_w80ir")
-display_time = 5.0
+display_time = 4.0
 handle_mouse_clicks = true
 
 [node name="MessageSound" type="AudioStreamPlayer" parent="."]

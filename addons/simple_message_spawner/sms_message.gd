@@ -53,7 +53,8 @@ func _ready():
 	display_timer = Timer.new()
 	add_child(display_timer)
 	display_timer.autostart = false
-	display_timer.one_shot = true
+	#display_timer.one_shot = true
+	display_timer.one_shot = false
 	display_timer.wait_time = display_time
 	display_timer.stop()
 	display_timer.timeout.connect(on_display_message_finished)
@@ -269,4 +270,10 @@ func check_mouse_cursor_in_viewport():
 		#print("Y is out of bounds")
 	
 	return true
-	
+
+func hide() -> void:
+	visible = false
+
+
+func show() -> void:
+	visible = true

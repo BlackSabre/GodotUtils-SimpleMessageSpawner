@@ -22,6 +22,7 @@ signal new_message_added_for_processing
 @onready var message_scene: PackedScene = preload("res://addons/simple_message_spawner/sms_message.tscn")
 
 var message_text_queue: Array[String]
+var messages_to_process: Array[SMS]
 var messages_on_screen: Array[SMSMessage]
 var message_action_array: Array[SMSMessageAction]
 
@@ -73,13 +74,18 @@ func process_message_move_array():
 	is_processing_message_move_array = true
 	var message_action: SMSMessageAction = message_action_array.pop_front()
 	
-	print("PMMA: Processing new action")
+	print("PMMA: Processing new action: ", message_action.get_action_type_string())
 	print("PMMA: Messages on screen size: ", messages_on_screen.size())
 	
-	if (message_action.get_action_type() == SMSMessageAction.ActionType.INITIAL_MOVE &&
+	if ((message_action.get_action_type() == SMSMessageAction.ActionType.INITIAL_PROCESS_MESSAGES ||
+			message_action.get_action_type() == SMSMessageAction.ActionType.PROCESS_MESSAGES) &&
 			messages_on_screen.size() >= max_messages_on_screen):
 		print("PMMA: Aborting new action")
+		#add_to_message_action_array(func(): process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
+		is_processing_message_move_array = false
 		process_message_move_array()
+		return
+		
 	
 	await message_action.run_action()
 	print("PMMA: Finished processing new action")
@@ -91,7 +97,8 @@ func process_message_move_array():
 func process_messages():
 	if is_processing_message_text_queue == true:
 		return
-		
+	
+	print("PM: Messages on screen: ", messages_on_screen.size())
 	if messages_on_screen.size() >= max_messages_on_screen:
 		return
 	
@@ -104,27 +111,32 @@ func process_messages():
 	var message: SMSMessage = await add_and_configure_message_object()
 	
 	if message == null:
+		is_processing_message_text_queue = false
 		return
 	
 	add_to_message_action_array(func(): await initial_reorder_on_screen_messages(message), SMSMessageAction.ActionType.INITIAL_REORDER_MOVE, message)
-	await process_message_move_array()
+	#await process_message_move_array()
 	
 	add_to_message_action_array(func(): await move_message_initial(message), SMSMessageAction.ActionType.INITIAL_MOVE, message)
-	await process_message_move_array()
+	#await process_message_move_array()
 	
 	add_to_message_action_array(func(): await display_message(message), SMSMessageAction.ActionType.DISPLAY, message)
-	await process_message_move_array()
-	print("PM: Finished processing more messages after appending display message: ", message.get_text())
+	#await process_message_move_array()
 	
 	is_processing_message_text_queue = false
 	
 	#print("PM: Appending process all messages again after message: ", message.get_text())
 	add_to_message_action_array(func(): process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
 	await process_message_move_array()
+	print("PM: Finished processing more messages after appending display message: ", message.get_text())
 
 
 func add_and_configure_message_object() -> SMSMessage:
 	await get_tree().process_frame
+	
+	if messages_on_screen.size() > max_messages_on_screen:
+		return
+	
 	print("AACMO: Getting and configuring new message")
 		
 	var message_text: String = message_text_queue.pop_front()
@@ -154,8 +166,8 @@ func move_message_initial(message: SMSMessage):
 		print("ALREADY DOING MESSAGE INITIAL MOVE: ", message.get_text())
 		return
 	
-	if messages_on_screen.size() >= max_messages_on_screen - 1:
-		return
+	#if messages_on_screen.size() >= max_messages_on_screen - 1:
+		#return
 		
 	is_doing_message_initial_move = true
 	message.z_index = -1
@@ -274,7 +286,7 @@ func initial_reorder_on_screen_messages(message: SMSMessage):
 
 
 func delete_message(message: SMSMessage):
-	#message.queue_free()
+	message.queue_free()
 	pass
 
 
@@ -282,20 +294,21 @@ func on_message_finished_displaying(message: SMSMessage):
 	print("OMFD: Message: ", message.get_text(), " has finished displaying.")
 	
 	add_to_message_action_array(func(): await move_message_off_screen(message), SMSMessageAction.ActionType.FINISHING_MOVE, message)
-	await process_message_move_array()
+	#await process_message_move_array()
 	
-	print("OMFD: Message: ", message.get_text(), " has finished moving. Reordering...")
+	#print("OMFD: Message: ", message.get_text(), " has finished moving. Reordering...")
 	
 	add_to_message_action_array(func(): await reorder_on_screen_messages(message), SMSMessageAction.ActionType.REORDER_MOVE, message)
-	await process_message_move_array()
+	#await process_message_move_array()
 	
-	print("OMFD: Message: ", message.get_text(), " has finished moving and reordering. Deleting...")
+	#print("OMFD: Message: ", message.get_text(), " has finished moving and reordering. Deleting...")
 	
 	add_to_message_action_array(func(): await delete_message(message), SMSMessageAction.ActionType.MESSAGE_DELETE, message)	
-	await process_message_move_array()
+	#await process_message_move_array()
 	
 	add_to_message_action_array(func(): process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
-	await process_message_move_array()
+	print("OMFD: Finished...?")
+	process_message_move_array()
 
 
 func add_to_message_action_array(action: Callable, action_type: SMSMessageAction.ActionType, 
