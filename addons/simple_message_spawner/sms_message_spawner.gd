@@ -22,7 +22,7 @@ signal new_message_added_for_processing
 @onready var message_scene: PackedScene = preload("res://addons/simple_message_spawner/sms_message.tscn")
 
 var message_text_queue: Array[String]
-var messages_to_process: Array[SMS]
+var messages_to_process: Array[SMSMessage]
 var messages_on_screen: Array[SMSMessage]
 var message_action_array: Array[SMSMessageAction]
 
@@ -31,6 +31,8 @@ var is_processing_message_move_array: bool = false
 var is_doing_message_initial_move: bool = false
 var is_reordering_messages: bool = false
 var is_moving_message_off_screen: bool = false
+
+var number_messages_processing: int = 0
 
 # Part of screen where the popups display. Didn't bother with left and right 
 # as it doesn't seem like normal behaviour for a message message of this 
@@ -57,9 +59,9 @@ func add_message(message_string: String):
 		return
 	
 	print("AM: New string: ", message_string, " received. Appending to message_move_array.")	
-	add_to_message_action_array(func(): process_messages(), SMSMessageAction.ActionType.INITIAL_PROCESS_MESSAGES)
+	add_to_message_action_array(func(): await process_messages(), SMSMessageAction.ActionType.INITIAL_PROCESS_MESSAGES)
 	
-	process_message_move_array()
+	await process_message_move_array()
 
 
 func process_message_move_array():
@@ -72,6 +74,7 @@ func process_message_move_array():
 		return
 	
 	is_processing_message_move_array = true
+	
 	var message_action: SMSMessageAction = message_action_array.pop_front()
 	
 	print("PMMA: Processing new action: ", message_action.get_action_type_string())
@@ -81,21 +84,23 @@ func process_message_move_array():
 			message_action.get_action_type() == SMSMessageAction.ActionType.PROCESS_MESSAGES) &&
 			messages_on_screen.size() >= max_messages_on_screen):
 		print("PMMA: Aborting new action")
-		#add_to_message_action_array(func(): process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
+		
 		is_processing_message_move_array = false
 		process_message_move_array()
 		return
-		
 	
 	await message_action.run_action()
-	print("PMMA: Finished processing new action")
+	print("PMMA: Finished processing new action: ", message_action.get_action_type_string())
 	
 	is_processing_message_move_array = false
 	process_message_move_array()
 
 
-func process_messages():
+func process_messages():	
 	if is_processing_message_text_queue == true:
+		return
+	
+	if number_messages_processing >= max_messages_on_screen:
 		return
 	
 	print("PM: Messages on screen: ", messages_on_screen.size())
@@ -105,8 +110,10 @@ func process_messages():
 	if message_text_queue.size() <= 0:
 		return
 	
+	print("PM: PM Start")
 	# Add message to message_text_queue
 	is_processing_message_text_queue = true
+	number_messages_processing += 1
 	
 	var message: SMSMessage = await add_and_configure_message_object()
 	
@@ -126,7 +133,7 @@ func process_messages():
 	is_processing_message_text_queue = false
 	
 	#print("PM: Appending process all messages again after message: ", message.get_text())
-	add_to_message_action_array(func(): process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
+	add_to_message_action_array(func(): await process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
 	await process_message_move_array()
 	print("PM: Finished processing more messages after appending display message: ", message.get_text())
 
@@ -286,8 +293,8 @@ func initial_reorder_on_screen_messages(message: SMSMessage):
 
 
 func delete_message(message: SMSMessage):
+	number_messages_processing -= 1
 	message.queue_free()
-	pass
 
 
 func on_message_finished_displaying(message: SMSMessage):
@@ -306,7 +313,7 @@ func on_message_finished_displaying(message: SMSMessage):
 	add_to_message_action_array(func(): await delete_message(message), SMSMessageAction.ActionType.MESSAGE_DELETE, message)	
 	#await process_message_move_array()
 	
-	add_to_message_action_array(func(): process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
+	add_to_message_action_array(func(): await process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
 	print("OMFD: Finished...?")
 	process_message_move_array()
 

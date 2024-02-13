@@ -48,9 +48,9 @@ func run_action():
 	if message != null:
 		message_text = message.get_text()
 	
-	print("Performing action: ", get_action_type_string(), " for message: ", message_text, " Time: ", Time.get_time_dict_from_system())
+	#print("SMSMSA: Performing action: ", get_action_type_string(), " for message: ", message_text, " Time: ", Time.get_time_dict_from_system())
 	await action.call()
-	print("Finished action: ", get_action_type_string(), " for message: ", message_text, " Time: ", Time.get_time_dict_from_system())
+	#print("SMSMSA: Finished action: ", get_action_type_string(), " for message: ", message_text, " Time: ", Time.get_time_dict_from_system())
 
 func get_action_type_string() -> String:
 	return ActionType.keys()[action_type]
