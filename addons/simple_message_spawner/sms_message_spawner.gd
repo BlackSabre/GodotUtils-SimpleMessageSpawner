@@ -219,7 +219,7 @@ func move_message_off_screen(message: SMSMessage):
 	print("MMOS: Finished moving message off screen: ", message.get_text())
 
 
-func reorder_on_screen_messages(message: SMSMessage):
+func reorder_on_screen_messages(message: SMSMessage, ignore_first_message: bool):
 	print("ROSM: Reordering all messages for message: ", message.get_text())
 	
 	if messages_on_screen.size() <= 0:
