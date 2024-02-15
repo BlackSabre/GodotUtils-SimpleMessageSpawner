@@ -121,7 +121,7 @@ func process_messages():
 		is_processing_message_text_queue = false
 		return
 	
-	add_to_message_action_array(func(): await initial_reorder_on_screen_messages(message), SMSMessageAction.ActionType.INITIAL_REORDER_MOVE, message)
+	add_to_message_action_array(func(): await reorder_on_screen_messages(message, true), SMSMessageAction.ActionType.INITIAL_REORDER_MOVE, message)
 	#await process_message_move_array()
 	
 	add_to_message_action_array(func(): await move_message_initial(message), SMSMessageAction.ActionType.INITIAL_MOVE, message)
@@ -219,7 +219,7 @@ func move_message_off_screen(message: SMSMessage):
 	print("MMOS: Finished moving message off screen: ", message.get_text())
 
 
-func reorder_on_screen_messages(message: SMSMessage, ignore_first_message: bool):
+func reorder_on_screen_messages(message: SMSMessage, ignore_first_message: bool = false):
 	print("ROSM: Reordering all messages for message: ", message.get_text())
 	
 	if messages_on_screen.size() <= 0:
@@ -229,15 +229,25 @@ func reorder_on_screen_messages(message: SMSMessage, ignore_first_message: bool)
 		print("ALREADY REORDERING MESSAGES: ", message.get_text())
 		return
 	
-	is_reordering_messages = true
-	var move_amount_y: float = message.size.y
-	
 	if message_screen_position == MessageScreenPosition.TOP:
-		move_amount_y = -move_amount_y
-		
+		await reorder_messages_at_top_of_screen(message, ignore_first_message)
+	else:
+		await reorder_messages_at_bottom_of_screen(message, ignore_first_message)
+	
+	
+
+
+func reorder_messages_at_top_of_screen(message: SMSMessage, ignore_first_message: bool = false):
+	is_reordering_messages = true
+	var move_amount_y: float = -message.size.y	
+	
 	var current_message_index = messages_on_screen.size() - 1
 	var y_position: float = 0
 	
+	if ignore_first_message == true:
+		# leaves space for message to move in 
+		y_position = message.size.y
+	
 	while current_message_index >= 0:
 		var current_message = messages_on_screen[current_message_index]
 		var target_position := Vector2(current_message.position.x, y_position)
@@ -250,46 +260,76 @@ func reorder_on_screen_messages(message: SMSMessage, ignore_first_message: bool)
 		if current_message.is_moving:
 			await current_message.moving_finished
 	
-	#await messages_on_screen[0].moving_finished
-	print("ROSM: Finished reordering all messages for message: ", message.get_text())
+	print("RSATOS: Finished reordering all messages for message: ", message.get_text())
 	
 	is_reordering_messages = false
 
 
-func initial_reorder_on_screen_messages(message: SMSMessage):
-	print("IROSM: Reordering all messages for message: ", message.get_text())
-	
-	if messages_on_screen.size() <= 0:
-		return
-	
-	if is_reordering_messages == true:
-		print("ALREADY INITIALLY REORDERING MESSAGES: ", message.get_text())
-		return
-	
+func reorder_messages_at_bottom_of_screen(message: SMSMessage, ignore_first_message: bool = false):
 	is_reordering_messages = true
 	var move_amount_y: float = message.size.y
+	var viewport_size_y: float = get_viewport().get_visible_rect().size.y
+	print("RMABOS: viewport_size_y: ", viewport_size_y)
 	
-	if message_screen_position == MessageScreenPosition.TOP:
-		move_amount_y = -move_amount_y
-		
 	var current_message_index = messages_on_screen.size() - 1
-	var y_position: float = message.size.y
+	var y_position: float = viewport_size_y - move_amount_y
+	
+	if ignore_first_message == true:
+		# leaves space for message to move in 
+		y_position -= move_amount_y
 	
 	while current_message_index >= 0:
 		var current_message = messages_on_screen[current_message_index]
 		var target_position := Vector2(current_message.position.x, y_position)
 		current_message.set_display_config_target_position(target_position)
 		current_message.move(current_message.position)
-		y_position += current_message.size.y
+		y_position -= current_message.size.y
 		current_message_index -= 1
 	
 	for current_message in messages_on_screen:
 		if current_message.is_moving:
 			await current_message.moving_finished
 	
-	print("IROSM: Finished reordering all messages for message: ", message.get_text())
+	print("RSATOS: Finished reordering all messages for message: ", message.get_text())
 	
 	is_reordering_messages = false
+
+
+
+#func initial_reorder_on_screen_messages(message: SMSMessage):
+	#print("IROSM: Reordering all messages for message: ", message.get_text())
+	#
+	#if messages_on_screen.size() <= 0:
+		#return
+	#
+	#if is_reordering_messages == true:
+		#print("ALREADY INITIALLY REORDERING MESSAGES: ", message.get_text())
+		#return
+	#
+	#is_reordering_messages = true
+	#var move_amount_y: float = message.size.y
+	#
+	#if message_screen_position == MessageScreenPosition.TOP:
+		#move_amount_y = -move_amount_y
+		#
+	#var current_message_index = messages_on_screen.size() - 1
+	#var y_position: float = message.size.y
+	#
+	#while current_message_index >= 0:
+		#var current_message = messages_on_screen[current_message_index]
+		#var target_position := Vector2(current_message.position.x, y_position)
+		#current_message.set_display_config_target_position(target_position)
+		#current_message.move(current_message.position)
+		#y_position += current_message.size.y
+		#current_message_index -= 1
+	#
+	#for current_message in messages_on_screen:
+		#if current_message.is_moving:
+			#await current_message.moving_finished
+	#
+	#print("IROSM: Finished reordering all messages for message: ", message.get_text())
+	#
+	#is_reordering_messages = false
 
 
 func delete_message(message: SMSMessage):
@@ -305,7 +345,7 @@ func on_message_finished_displaying(message: SMSMessage):
 	
 	#print("OMFD: Message: ", message.get_text(), " has finished moving. Reordering...")
 	
-	add_to_message_action_array(func(): await reorder_on_screen_messages(message), SMSMessageAction.ActionType.REORDER_MOVE, message)
+	add_to_message_action_array(func(): await reorder_on_screen_messages(message, false), SMSMessageAction.ActionType.REORDER_MOVE, message)
 	#await process_message_move_array()
 	
 	#print("OMFD: Message: ", message.get_text(), " has finished moving and reordering. Deleting...")
