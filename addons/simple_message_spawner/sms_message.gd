@@ -37,6 +37,7 @@ var mouse_inside: bool = false
 var handling_mouse_click: bool = false
 var pause_displaying: bool = false
 var text: String
+var is_set_to_delete = false
 
 var display_timer: Timer
 var test_orig_colour: Color
@@ -251,7 +252,7 @@ func _on_mouse_exited():
 	if handle_mouse_clicks == false || is_moving == true:
 		return
 		
-	mouse_inside = false	
+	mouse_inside = false
 	modulate = test_orig_colour
 	display_timer.start(display_time)
 
@@ -271,9 +272,15 @@ func check_mouse_cursor_in_viewport():
 	
 	return true
 
+
 func hide() -> void:
 	visible = false
 
 
 func show() -> void:
 	visible = true
+
+
+func stop_timer() -> void:
+	if display_timer == null:
+		display_timer.stop()

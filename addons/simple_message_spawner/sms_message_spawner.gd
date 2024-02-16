@@ -77,6 +77,13 @@ func process_message_move_array():
 	
 	var message_action: SMSMessageAction = message_action_array.pop_front()
 	
+	if is_instance_valid(message_action) == false:
+		return	
+	
+	#if is_instance_valid(message_action.action) == false:
+		#return
+	
+	
 	print("PMMA: Processing new action: ", message_action.get_action_type_string())
 	print("PMMA: Messages on screen size: ", messages_on_screen.size())
 	
@@ -200,6 +207,9 @@ func display_message(message: SMSMessage):
 
 
 func move_message_off_screen(message: SMSMessage):
+	if is_instance_valid(message) == false:
+		return
+	
 	print("MMOS: Moving message off screen: ", message.get_text())	
 		
 	is_moving_message_off_screen = true
@@ -220,6 +230,9 @@ func move_message_off_screen(message: SMSMessage):
 
 
 func reorder_on_screen_messages(message: SMSMessage, ignore_first_message: bool = false):
+	if is_instance_valid(message) == false:
+		return
+		
 	print("ROSM: Reordering all messages for message: ", message.get_text())
 	
 	if messages_on_screen.size() <= 0:
@@ -233,8 +246,6 @@ func reorder_on_screen_messages(message: SMSMessage, ignore_first_message: bool 
 		await reorder_messages_at_top_of_screen(message, ignore_first_message)
 	else:
 		await reorder_messages_at_bottom_of_screen(message, ignore_first_message)
-	
-	
 
 
 func reorder_messages_at_top_of_screen(message: SMSMessage, ignore_first_message: bool = false):
@@ -333,13 +344,25 @@ func reorder_messages_at_bottom_of_screen(message: SMSMessage, ignore_first_mess
 
 
 func delete_message(message: SMSMessage):
+	if is_instance_valid(message) == false:
+		return
+	
+	var action_index: int = 0
+	
+	message.is_set_to_delete = true
+	for action in message_action_array:
+		if message == action.get_message():
+			message_action_array.remove_at(action_index)
+		
+		action_index += 1 
+	
 	number_messages_processing -= 1
 	message.queue_free()
 
 
 func on_message_finished_displaying(message: SMSMessage):
 	print("OMFD: Message: ", message.get_text(), " has finished displaying.")
-	
+		
 	add_to_message_action_array(func(): await move_message_off_screen(message), SMSMessageAction.ActionType.FINISHING_MOVE, message)
 	#await process_message_move_array()
 	
@@ -354,6 +377,7 @@ func on_message_finished_displaying(message: SMSMessage):
 	#await process_message_move_array()
 	
 	add_to_message_action_array(func(): await process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
+	
 	print("OMFD: Finished...?")
 	process_message_move_array()
 

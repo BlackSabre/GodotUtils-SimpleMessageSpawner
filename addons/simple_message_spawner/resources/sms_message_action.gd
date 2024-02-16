@@ -21,6 +21,10 @@ func get_action_type() -> ActionType:
 	return action_type
 
 
+func get_message() -> SMSMessage:
+	return message
+
+
 func set_message(new_message: SMSMessage):
 	message = new_message
 
@@ -43,14 +47,21 @@ func run_action():
 		print_debug("Please set the action before attempting to run the action")
 		return
 	
+	if action.is_valid() == false:
+		return
+	
 	var message_text: String = "NoMessage"
 	
 	if message != null:
 		message_text = message.get_text()
 	
-	#print("SMSMSA: Performing action: ", get_action_type_string(), " for message: ", message_text, " Time: ", Time.get_time_dict_from_system())
+	if message != null && message.is_set_to_delete == true:
+		return
+	
+	#print("SMSMSA: Performing action: ", get_action_type_string(), " for message: ", message_text, " Time: ", Time.get_time_dict_from_system())	
 	await action.call()
 	#print("SMSMSA: Finished action: ", get_action_type_string(), " for message: ", message_text, " Time: ", Time.get_time_dict_from_system())
+
 
 func get_action_type_string() -> String:
 	return ActionType.keys()[action_type]
