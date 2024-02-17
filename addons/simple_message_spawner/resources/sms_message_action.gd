@@ -55,7 +55,7 @@ func run_action():
 	if message != null:
 		message_text = message.get_text()
 	
-	if message != null && message.is_set_to_delete == true:
+	if message == null && action_type != ActionType.PROCESS_MESSAGES && action_type != ActionType.INITIAL_PROCESS_MESSAGES:
 		return
 	
 	#print("SMSMSA: Performing action: ", get_action_type_string(), " for message: ", message_text, " Time: ", Time.get_time_dict_from_system())	
