@@ -28,7 +28,8 @@ signal resume_displaying(message: SMSMessage)
 ## Whether this object intercepts mouse clicks
 @export var handle_mouse_clicks: bool
 
-@onready var message_label: Label = $MessageMarginContainer/MessageLabel
+@onready var message_label: Label = $MessageMarginContainer/HBoxContainer/MessageLabel
+@onready var message_margin_container: MarginContainer = $MessageMarginContainer
 @onready var message_sound: AudioStreamPlayer = $MessageSound
 
 var is_moving: bool = false
@@ -58,12 +59,13 @@ func _ready():
 	display_timer.one_shot = false
 	display_timer.wait_time = display_time
 	display_timer.stop()
-	display_timer.timeout.connect(on_display_message_finished)
+	display_timer.timeout.connect(on_display_message_finished)	
 	
 	if handle_mouse_clicks == true:
 		mouse_filter = MOUSE_FILTER_STOP
 	else:
 		mouse_filter = MOUSE_FILTER_IGNORE
+	
 	
 	
 
@@ -96,6 +98,9 @@ func set_label_text(new_text: String) -> void:
 	self.text = new_text
 	message_label.text = new_text
 	name = "PC_" + new_text
+	
+	await get_tree().process_frame
+	size.y = message_margin_container.size.y
 
 
 # sets the target_position in display_message_config
@@ -241,6 +246,7 @@ func _on_mouse_entered():
 	if check_mouse_cursor_in_viewport() == false:
 		return
 	
+	print("Mouse entered message: ", get_text())
 	test_orig_colour = modulate
 	modulate = Color.CHARTREUSE
 	display_timer.stop()
@@ -249,9 +255,10 @@ func _on_mouse_entered():
 
 
 func _on_mouse_exited():
-	if handle_mouse_clicks == false || is_moving == true:
+	if handle_mouse_clicks == false:
 		return
-		
+	
+	print("Mouse exited message: ", get_text())
 	mouse_inside = false
 	modulate = test_orig_colour
 	display_timer.start(display_time)

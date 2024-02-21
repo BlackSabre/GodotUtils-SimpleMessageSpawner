@@ -1,15 +1,16 @@
-[gd_scene load_steps=6 format=3 uid="uid://cb2b3a4e5w2mb"]
+[gd_scene load_steps=7 format=3 uid="uid://cb2b3a4e5w2mb"]
 
 [ext_resource type="Script" path="res://addons/simple_message_spawner/sms_message.gd" id="1_g28vo"]
 [ext_resource type="Theme" uid="uid://bce8trn6jgasu" path="res://addons/simple_message_spawner/resources/sms_message_theme.tres" id="1_lapq8"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/sms_message_move_config.gd" id="2_g5dls"]
+[ext_resource type="Texture2D" uid="uid://drqj4byi0fjcy" path="res://icon.svg" id="4_fnc8q"]
 
 [sub_resource type="Resource" id="Resource_i1up0"]
 script = ExtResource("2_g5dls")
 to_panel_container_colour = Color(0, 0, 1, 1)
 to_text_colour = Color(1, 1, 1, 1)
-change_duration = 1.0
-move_duration = 1.0
+change_duration = 0.4
+move_duration = 0.4
 move_tween_transition_type = 7
 move_tween_ease_type = 0
 change_tween_transition_type = 0
@@ -19,8 +20,8 @@ change_tween_ease_type = 0
 script = ExtResource("2_g5dls")
 to_panel_container_colour = Color(1, 1, 1, 0)
 to_text_colour = Color(1, 1, 1, 0)
-change_duration = 1.0
-move_duration = 1.0
+change_duration = 0.4
+move_duration = 0.4
 move_tween_transition_type = 7
 move_tween_ease_type = 0
 change_tween_transition_type = 0
@@ -30,7 +31,7 @@ change_tween_ease_type = 0
 top_level = true
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 22.0
+offset_bottom = 85.0
 grow_horizontal = 2
 theme = ExtResource("1_lapq8")
 script = ExtResource("1_g28vo")
@@ -51,13 +52,32 @@ theme_override_constants/margin_top = 5
 theme_override_constants/margin_right = 5
 theme_override_constants/margin_bottom = 5
 
-[node name="MessageLabel" type="Label" parent="MessageMarginContainer"]
+[node name="HBoxContainer" type="HBoxContainer" parent="MessageMarginContainer"]
+layout_mode = 2
+alignment = 1
+
+[node name="ImageMarginContainer" type="MarginContainer" parent="MessageMarginContainer/HBoxContainer"]
+layout_mode = 2
+
+[node name="GridContainer" type="GridContainer" parent="MessageMarginContainer/HBoxContainer/ImageMarginContainer"]
+layout_mode = 2
+
+[node name="MessageImage" type="TextureRect" parent="MessageMarginContainer/HBoxContainer/ImageMarginContainer/GridContainer"]
+visible = false
+layout_mode = 2
+texture = ExtResource("4_fnc8q")
+stretch_mode = 5
+
+[node name="MessageLabel" type="Label" parent="MessageMarginContainer/HBoxContainer"]
 custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
-size_flags_vertical = 0
+size_flags_horizontal = 3
+size_flags_vertical = 1
 mouse_filter = 1
+theme_override_colors/font_color = Color(0, 0, 0, 1)
 theme_override_font_sizes/font_size = 20
 text = "This is an annoying message!"
+vertical_alignment = 1
 autowrap_mode = 2
 
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]

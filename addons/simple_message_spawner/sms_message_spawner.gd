@@ -58,7 +58,7 @@ func add_message(message_string: String):
 	if messages_on_screen.size() >= max_messages_on_screen:
 		return
 	
-	print("AM: New string: ", message_string, " received. Appending to message_move_array.")	
+	#print("AM: New string: ", message_string, " received. Appending to message_move_array.")	
 	add_to_message_action_array(func(): await process_messages(), SMSMessageAction.ActionType.INITIAL_PROCESS_MESSAGES)
 	
 	await process_message_move_array()
@@ -84,20 +84,20 @@ func process_message_move_array():
 		#return
 	
 	
-	print("PMMA: Processing new action: ", message_action.get_action_type_string())
-	print("PMMA: Messages on screen size: ", messages_on_screen.size())
+	#print("PMMA: Processing new action: ", message_action.get_action_type_string())
+	#print("PMMA: Messages on screen size: ", messages_on_screen.size())
 	
 	if ((message_action.get_action_type() == SMSMessageAction.ActionType.INITIAL_PROCESS_MESSAGES ||
 			message_action.get_action_type() == SMSMessageAction.ActionType.PROCESS_MESSAGES) &&
 			messages_on_screen.size() >= max_messages_on_screen):
-		print("PMMA: Aborting new action")
+		#print("PMMA: Aborting new action")
 		
 		is_processing_message_move_array = false
 		process_message_move_array()
 		return
 	
 	await message_action.run_action()
-	print("PMMA: Finished processing new action: ", message_action.get_action_type_string())
+	#print("PMMA: Finished processing new action: ", message_action.get_action_type_string())
 	
 	is_processing_message_move_array = false
 	process_message_move_array()
@@ -110,14 +110,14 @@ func process_messages():
 	if number_messages_processing >= max_messages_on_screen:
 		return
 	
-	print("PM: Messages on screen: ", messages_on_screen.size())
+	#print("PM: Messages on screen: ", messages_on_screen.size())
 	if messages_on_screen.size() >= max_messages_on_screen:
 		return
 	
 	if message_text_queue.size() <= 0:
 		return
 	
-	print("PM: PM Start")
+	#print("PM: PM Start")
 	# Add message to message_text_queue
 	is_processing_message_text_queue = true
 	number_messages_processing += 1
@@ -142,7 +142,7 @@ func process_messages():
 	#print("PM: Appending process all messages again after message: ", message.get_text())
 	add_to_message_action_array(func(): await process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
 	await process_message_move_array()
-	print("PM: Finished processing more messages after appending display message: ", message.get_text())
+	#print("PM: Finished processing more messages after appending display message: ", message.get_text())
 
 
 func add_and_configure_message_object() -> SMSMessage:
@@ -151,7 +151,7 @@ func add_and_configure_message_object() -> SMSMessage:
 	if messages_on_screen.size() > max_messages_on_screen:
 		return
 	
-	print("AACMO: Getting and configuring new message")
+	#print("AACMO: Getting and configuring new message")
 		
 	var message_text: String = message_text_queue.pop_front()
 	var message: SMSMessage = message_scene.instantiate()
@@ -169,19 +169,16 @@ func add_and_configure_message_object() -> SMSMessage:
 	message.z_index = 0
 	
 	await get_tree().process_frame
-	print("AACMO: Finished getting and configuring new message. Message: ", message.get_text())
+	#print("AACMO: Finished getting and configuring new message. Message: ", message.get_text())
 	return message
 
 
 func move_message_initial(message: SMSMessage):
-	print("MMI: Doing initial move for message: ", message.get_text())
+	#print("MMI: Doing initial move for message: ", message.get_text())
 	
 	if is_doing_message_initial_move == true:
-		print("ALREADY DOING MESSAGE INITIAL MOVE: ", message.get_text())
+		#print("ALREADY DOING MESSAGE INITIAL MOVE: ", message.get_text())
 		return
-	
-	#if messages_on_screen.size() >= max_messages_on_screen - 1:
-		#return
 		
 	is_doing_message_initial_move = true
 	message.z_index = -1
@@ -196,11 +193,11 @@ func move_message_initial(message: SMSMessage):
 	messages_on_screen.append(message)
 	
 	is_doing_message_initial_move = false
-	print("MMI: Finished doing initial move for message: ", message.get_text())
+	#print("MMI: Finished doing initial move for message: ", message.get_text())
 
 
 func display_message(message: SMSMessage):
-	print("DM: Displaying message: ", message.get_text())
+	#print("DM: Displaying message: ", message.get_text())
 	message.z_index = 0
 	message.modulate = Color.RED
 	message.display_message(message.position, true)
@@ -210,7 +207,7 @@ func move_message_off_screen(message: SMSMessage):
 	if is_instance_valid(message) == false:
 		return
 	
-	print("MMOS: Moving message off screen: ", message.get_text())	
+	#print("MMOS: Moving message off screen: ", message.get_text())	
 		
 	is_moving_message_off_screen = true
 	
@@ -226,20 +223,20 @@ func move_message_off_screen(message: SMSMessage):
 		messages_on_screen.remove_at(message_index)
 	
 	is_moving_message_off_screen = false
-	print("MMOS: Finished moving message off screen: ", message.get_text())
+	#print("MMOS: Finished moving message off screen: ", message.get_text())
 
 
 func reorder_on_screen_messages(message: SMSMessage, ignore_first_message: bool = false):
 	if is_instance_valid(message) == false:
 		return
 		
-	print("ROSM: Reordering all messages for message: ", message.get_text())
+	#print("ROSM: Reordering all messages for message: ", message.get_text())
 	
 	if messages_on_screen.size() <= 0:
 		return
 	
 	if is_reordering_messages == true:
-		print("ALREADY REORDERING MESSAGES: ", message.get_text())
+		#print("ALREADY REORDERING MESSAGES: ", message.get_text())
 		return
 	
 	if message_screen_position == MessageScreenPosition.TOP:
@@ -271,7 +268,7 @@ func reorder_messages_at_top_of_screen(message: SMSMessage, ignore_first_message
 		if current_message.is_moving:
 			await current_message.moving_finished
 	
-	print("RSATOS: Finished reordering all messages for message: ", message.get_text())
+	#print("RSATOS: Finished reordering all messages for message: ", message.get_text())
 	
 	is_reordering_messages = false
 
@@ -280,7 +277,7 @@ func reorder_messages_at_bottom_of_screen(message: SMSMessage, ignore_first_mess
 	is_reordering_messages = true
 	var move_amount_y: float = message.size.y
 	var viewport_size_y: float = get_viewport().get_visible_rect().size.y
-	print("RMABOS: viewport_size_y: ", viewport_size_y)
+	#print("RMABOS: viewport_size_y: ", viewport_size_y)
 	
 	var current_message_index = messages_on_screen.size() - 1
 	var y_position: float = viewport_size_y - move_amount_y
@@ -301,46 +298,9 @@ func reorder_messages_at_bottom_of_screen(message: SMSMessage, ignore_first_mess
 		if current_message.is_moving:
 			await current_message.moving_finished
 	
-	print("RSATOS: Finished reordering all messages for message: ", message.get_text())
+	#print("RSATOS: Finished reordering all messages for message: ", message.get_text())
 	
 	is_reordering_messages = false
-
-
-
-#func initial_reorder_on_screen_messages(message: SMSMessage):
-	#print("IROSM: Reordering all messages for message: ", message.get_text())
-	#
-	#if messages_on_screen.size() <= 0:
-		#return
-	#
-	#if is_reordering_messages == true:
-		#print("ALREADY INITIALLY REORDERING MESSAGES: ", message.get_text())
-		#return
-	#
-	#is_reordering_messages = true
-	#var move_amount_y: float = message.size.y
-	#
-	#if message_screen_position == MessageScreenPosition.TOP:
-		#move_amount_y = -move_amount_y
-		#
-	#var current_message_index = messages_on_screen.size() - 1
-	#var y_position: float = message.size.y
-	#
-	#while current_message_index >= 0:
-		#var current_message = messages_on_screen[current_message_index]
-		#var target_position := Vector2(current_message.position.x, y_position)
-		#current_message.set_display_config_target_position(target_position)
-		#current_message.move(current_message.position)
-		#y_position += current_message.size.y
-		#current_message_index -= 1
-	#
-	#for current_message in messages_on_screen:
-		#if current_message.is_moving:
-			#await current_message.moving_finished
-	#
-	#print("IROSM: Finished reordering all messages for message: ", message.get_text())
-	#
-	#is_reordering_messages = false
 
 
 func delete_message(message: SMSMessage):
@@ -361,7 +321,7 @@ func delete_message(message: SMSMessage):
 
 
 func on_message_finished_displaying(message: SMSMessage):
-	print("OMFD: Message: ", message.get_text(), " has finished displaying.")
+	#print("OMFD: Message: ", message.get_text(), " has finished displaying.")
 		
 	add_to_message_action_array(func(): await move_message_off_screen(message), SMSMessageAction.ActionType.FINISHING_MOVE, message)
 	#await process_message_move_array()
@@ -378,7 +338,7 @@ func on_message_finished_displaying(message: SMSMessage):
 	
 	add_to_message_action_array(func(): await process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
 	
-	print("OMFD: Finished...?")
+	#print("OMFD: Finished...?")
 	process_message_move_array()
 
 
