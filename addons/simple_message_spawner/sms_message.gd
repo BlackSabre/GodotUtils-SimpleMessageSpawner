@@ -8,10 +8,21 @@ signal delete_message
 signal resume_displaying(message: SMSMessage)
 
 ## Colour of the message panel container when created
-@export var start_panel_container_colour: Color
+@export var start_panel_container_modulation: Color = Color.TRANSPARENT
 
 ## Colour of the message text when created
-@export var start_text_colour: Color
+@export var start_text_colour: Color = Color.TRANSPARENT
+
+## Colour of image when created
+@export var start_image_modulation: Color = Color.TRANSPARENT
+
+## Highlight colour of text when hovering over a message with mouse.
+## Only works if handle_mouse_clicks is true
+@export var text_highlight_colour: Color
+
+## Highlight colour of the panel container when hovering over a message with mouse.
+## Only works if handle_mouse_clicks is true
+@export var panel_highlight_colour: Color
 
 ## Contains parameters for moving a message to a position on screen, where the user can
 ## read it. The actual position is set in the sms_message_spawner
@@ -28,7 +39,8 @@ signal resume_displaying(message: SMSMessage)
 ## Whether this object intercepts mouse clicks
 @export var handle_mouse_clicks: bool
 
-@onready var message_label: Label = $MessageMarginContainer/HBoxContainer/MessageLabel
+@onready var message_rich_label: RichTextLabel = $MessageMarginContainer/HBoxContainer/RichTextMessageLabel
+@onready var image_texture_rect: TextureRect = $MessageMarginContainer/HBoxContainer/ImageMarginContainer/MessageImage
 @onready var message_margin_container: MarginContainer = $MessageMarginContainer
 @onready var message_sound: AudioStreamPlayer = $MessageSound
 
@@ -49,8 +61,8 @@ enum move_configs {
 }
 
 func _ready():
-	self_modulate.a = 0
-	message_label.modulate.a = 0
+	set_initial_modulations_and_textures()
+	
 	
 	display_timer = Timer.new()
 	add_child(display_timer)
@@ -66,8 +78,7 @@ func _ready():
 	else:
 		mouse_filter = MOUSE_FILTER_IGNORE
 	
-	
-	
+
 
 func _input(event):
 	if handle_mouse_clicks == false:
@@ -80,8 +91,14 @@ func _input(event):
 			handle_mouse_click()
 
 
+func set_initial_modulations_and_textures():
+	image_texture_rect.self_modulate = start_image_modulation
+	self_modulate.a = 0
+	message_rich_label.modulate.a = 0
+
+
 func get_text():
-	return message_label.text
+	return message_rich_label.text
 	
 
 func handle_mouse_click():
@@ -89,14 +106,14 @@ func handle_mouse_click():
 		return
 	
 	handling_mouse_click = true
-	await get_tree().create_timer(3).timeout
+	print("clickckkc")
 	handling_mouse_click = false
 
 
-# sets the text in message_label
+# sets the text in message_rich_label
 func set_label_text(new_text: String) -> void:
 	self.text = new_text
-	message_label.text = new_text
+	message_rich_label.text = new_text
 	name = "PC_" + new_text
 	
 	await get_tree().process_frame
@@ -122,7 +139,7 @@ func display_message(start_position: Vector2, change_colour: bool):
 		
 	self.position = start_position
 	self_modulate.a = 1
-	message_label.modulate.a = 1
+	message_rich_label.modulate.a = 1
 	
 	if message_sound != null:
 		message_sound.play()
@@ -160,9 +177,9 @@ func move(start_position: Vector2, change_colour: bool = false, use_tween_transi
 	if use_start_colours:
 		self.position = start_position
 		self_modulate.a = 1
-		message_label.modulate.a = 1
-		self_modulate = start_panel_container_colour
-		message_label.add_theme_color_override("font_color", start_text_colour)	
+		message_rich_label.modulate.a = 1
+		self_modulate = start_panel_container_modulation
+		message_rich_label.add_theme_color_override("font_color", start_text_colour)	
 		
 	is_moving = true
 	
@@ -183,7 +200,7 @@ func move(start_position: Vector2, change_colour: bool = false, use_tween_transi
 		colour_tween = create_tween()
 		colour_tween.set_parallel(true)		
 		colour_tween.tween_property(self, "self_modulate", message_config.to_panel_container_colour, message_config.change_duration)
-		colour_tween.tween_property(self.message_label, "theme_override_colors/font_color", message_config.to_text_colour, message_config.change_duration)
+		colour_tween.tween_property(self.message_rich_label, "theme_override_colors/font_color", message_config.to_text_colour, message_config.change_duration)
 	
 	if terminate_after == true:
 		move_tween.tween_callback(finish_move_and_delete).set_delay(message_config.move_duration)
@@ -243,8 +260,8 @@ func _on_mouse_entered():
 	if handle_mouse_clicks == false:
 		return
 	
-	if check_mouse_cursor_in_viewport() == false:
-		return
+	#if check_mouse_cursor_in_viewport() == false:
+	#	return
 	
 	print("Mouse entered message: ", get_text())
 	test_orig_colour = modulate

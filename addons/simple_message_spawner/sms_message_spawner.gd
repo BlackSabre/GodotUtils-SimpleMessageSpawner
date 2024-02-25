@@ -199,7 +199,7 @@ func move_message_initial(message: SMSMessage):
 func display_message(message: SMSMessage):
 	#print("DM: Displaying message: ", message.get_text())
 	message.z_index = 0
-	message.modulate = Color.RED
+	#message.modulate = Color.RED
 	message.display_message(message.position, true)
 
 
@@ -239,14 +239,17 @@ func reorder_on_screen_messages(message: SMSMessage, ignore_first_message: bool 
 		#print("ALREADY REORDERING MESSAGES: ", message.get_text())
 		return
 	
+	is_reordering_messages = true
+	
 	if message_screen_position == MessageScreenPosition.TOP:
 		await reorder_messages_at_top_of_screen(message, ignore_first_message)
 	else:
 		await reorder_messages_at_bottom_of_screen(message, ignore_first_message)
+	
+	is_reordering_messages = false
 
 
 func reorder_messages_at_top_of_screen(message: SMSMessage, ignore_first_message: bool = false):
-	is_reordering_messages = true
 	var move_amount_y: float = -message.size.y	
 	
 	var current_message_index = messages_on_screen.size() - 1
@@ -269,12 +272,9 @@ func reorder_messages_at_top_of_screen(message: SMSMessage, ignore_first_message
 			await current_message.moving_finished
 	
 	#print("RSATOS: Finished reordering all messages for message: ", message.get_text())
-	
-	is_reordering_messages = false
 
 
 func reorder_messages_at_bottom_of_screen(message: SMSMessage, ignore_first_message: bool = false):
-	is_reordering_messages = true
 	var move_amount_y: float = message.size.y
 	var viewport_size_y: float = get_viewport().get_visible_rect().size.y
 	#print("RMABOS: viewport_size_y: ", viewport_size_y)
@@ -299,8 +299,6 @@ func reorder_messages_at_bottom_of_screen(message: SMSMessage, ignore_first_mess
 			await current_message.moving_finished
 	
 	#print("RSATOS: Finished reordering all messages for message: ", message.get_text())
-	
-	is_reordering_messages = false
 
 
 func delete_message(message: SMSMessage):
@@ -375,7 +373,7 @@ func set_anchors(message: SMSMessage, message_screen_position: MessageScreenPosi
 # the offset based on where its set to come from in the message_source_direction
 # variable using the size of the message since the anchors are set
 func get_message_start_position(message: SMSMessage) -> Vector2:	
-	var viewport_size = get_viewport().get_visible_rect().size
+	var viewport_size: Vector2 = get_viewport().get_visible_rect().size
 	var start_position_x: float
 	var start_position_y: float
 	var start_position: Vector2

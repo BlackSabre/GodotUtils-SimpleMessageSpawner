@@ -1,16 +1,16 @@
-[gd_scene load_steps=7 format=3 uid="uid://cb2b3a4e5w2mb"]
+[gd_scene load_steps=12 format=3 uid="uid://cb2b3a4e5w2mb"]
 
 [ext_resource type="Script" path="res://addons/simple_message_spawner/sms_message.gd" id="1_g28vo"]
 [ext_resource type="Theme" uid="uid://bce8trn6jgasu" path="res://addons/simple_message_spawner/resources/sms_message_theme.tres" id="1_lapq8"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/sms_message_move_config.gd" id="2_g5dls"]
-[ext_resource type="Texture2D" uid="uid://drqj4byi0fjcy" path="res://icon.svg" id="4_fnc8q"]
+[ext_resource type="Texture2D" uid="uid://o331m2u5d005" path="res://addons/simple_message_spawner/demo_ resources/images/godotIconWink128x128.png" id="4_nkwy2"]
 
 [sub_resource type="Resource" id="Resource_i1up0"]
 script = ExtResource("2_g5dls")
 to_panel_container_colour = Color(0, 0, 1, 1)
 to_text_colour = Color(1, 1, 1, 1)
-change_duration = 0.4
-move_duration = 0.4
+change_duration = 0.3
+move_duration = 0.3
 move_tween_transition_type = 7
 move_tween_ease_type = 0
 change_tween_transition_type = 0
@@ -20,22 +20,71 @@ change_tween_ease_type = 0
 script = ExtResource("2_g5dls")
 to_panel_container_colour = Color(1, 1, 1, 0)
 to_text_colour = Color(1, 1, 1, 0)
-change_duration = 0.4
-move_duration = 0.4
+change_duration = 0.3
+move_duration = 0.3
 move_tween_transition_type = 7
 move_tween_ease_type = 0
 change_tween_transition_type = 0
 change_tween_ease_type = 0
 
+[sub_resource type="AtlasTexture" id="AtlasTexture_v8hbb"]
+atlas = ExtResource("4_nkwy2")
+region = Rect2(0, 0, 128, 128)
+
+[sub_resource type="FontFile" id="FontFile_dvrij"]
+cache/0/16/0/ascent = 0.0
+cache/0/16/0/descent = 0.0
+cache/0/16/0/underline_position = 0.0
+cache/0/16/0/underline_thickness = 0.0
+cache/0/16/0/scale = 1.0
+cache/0/16/0/kerning_overrides/16/0 = Vector2(0, 0)
+
+[sub_resource type="Animation" id="Animation_ik31k"]
+length = 0.001
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MessageMarginContainer/HBoxContainer/ImageMarginContainer/MessageImage:texture:region")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0),
+"transitions": PackedFloat32Array(1),
+"update": 0,
+"values": [Rect2(0, 0, 128, 128)]
+}
+
+[sub_resource type="Animation" id="Animation_43yxj"]
+resource_name = "godot_icon_wink"
+length = 0.9
+loop_mode = 1
+tracks/0/type = "value"
+tracks/0/imported = false
+tracks/0/enabled = true
+tracks/0/path = NodePath("MessageMarginContainer/HBoxContainer/ImageMarginContainer/MessageImage:texture:region")
+tracks/0/interp = 1
+tracks/0/loop_wrap = true
+tracks/0/keys = {
+"times": PackedFloat32Array(0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8),
+"transitions": PackedFloat32Array(1, 1, 1, 1, 1, 1, 1, 1, 1),
+"update": 1,
+"values": [Rect2(0, 0, 128, 128), Rect2(129, 0, 128, 128), Rect2(258, 0, 128, 128), Rect2(387, 0, 128, 128), Rect2(0, 129, 128, 128), Rect2(387, 0, 128, 128), Rect2(258, 0, 128, 128), Rect2(129, 0, 128, 128), Rect2(0, 0, 128, 128)]
+}
+
+[sub_resource type="AnimationLibrary" id="AnimationLibrary_2lpqs"]
+_data = {
+"RESET": SubResource("Animation_ik31k"),
+"godot_icon_wink": SubResource("Animation_43yxj")
+}
+
 [node name="SMSMessage" type="PanelContainer"]
 top_level = true
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 85.0
+offset_bottom = 90.0
 grow_horizontal = 2
 theme = ExtResource("1_lapq8")
 script = ExtResource("1_g28vo")
-start_panel_container_colour = Color(0, 0, 0.945098, 0)
 start_text_colour = Color(0.745098, 0.745098, 0.745098, 0)
 display_message_config = SubResource("Resource_i1up0")
 exit_message_config = SubResource("Resource_w80ir")
@@ -58,27 +107,47 @@ alignment = 1
 
 [node name="ImageMarginContainer" type="MarginContainer" parent="MessageMarginContainer/HBoxContainer"]
 layout_mode = 2
+size_flags_horizontal = 2
+size_flags_stretch_ratio = 0.0
 
-[node name="GridContainer" type="GridContainer" parent="MessageMarginContainer/HBoxContainer/ImageMarginContainer"]
+[node name="MessageImage" type="TextureRect" parent="MessageMarginContainer/HBoxContainer/ImageMarginContainer"]
+custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
-
-[node name="MessageImage" type="TextureRect" parent="MessageMarginContainer/HBoxContainer/ImageMarginContainer/GridContainer"]
-visible = false
-layout_mode = 2
-texture = ExtResource("4_fnc8q")
+texture = SubResource("AtlasTexture_v8hbb")
+expand_mode = 1
 stretch_mode = 5
 
 [node name="MessageLabel" type="Label" parent="MessageMarginContainer/HBoxContainer"]
+visible = false
 custom_minimum_size = Vector2(1, 0)
 layout_mode = 2
 size_flags_horizontal = 3
 size_flags_vertical = 1
 mouse_filter = 1
 theme_override_colors/font_color = Color(0, 0, 0, 1)
-theme_override_font_sizes/font_size = 20
+theme_override_font_sizes/font_size = 24
 text = "This is an annoying message!"
 vertical_alignment = 1
 autowrap_mode = 2
+
+[node name="RichTextMessageLabel" type="RichTextLabel" parent="MessageMarginContainer/HBoxContainer"]
+layout_mode = 2
+size_flags_horizontal = 3
+mouse_filter = 1
+theme_override_colors/default_color = Color(0, 0, 0, 1)
+theme_override_fonts/normal_font = SubResource("FontFile_dvrij")
+bbcode_enabled = true
+text = "fafdssfdafdsfsdfsdasdjfkhjskdahjklhsadlkh gfdgdfsgdf
+sdaf"
+fit_content = true
+scroll_active = false
+shortcut_keys_enabled = false
+
+[node name="MessageImageAnimationPlayer" type="AnimationPlayer" parent="."]
+libraries = {
+"": SubResource("AnimationLibrary_2lpqs")
+}
+autoplay = "godot_icon_wink"
 
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

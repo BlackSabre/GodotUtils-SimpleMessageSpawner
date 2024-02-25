@@ -1,6 +1,8 @@
+RichTextLabel
+TextureRect
+AnimationPlayer
 GridContainer
 AnimatedSprite2D
 HBoxContainer
-TextureRect
 MarginContainer
 Timer

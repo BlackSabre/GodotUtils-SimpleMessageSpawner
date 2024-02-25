@@ -13,7 +13,7 @@ config_version=5
 config/name="Simple Message Spawner"
 config/description="An easy way to add configurable messages to notify the user of anything. Can customise colours, transition_types and whether they show on the top or bottom of the screen."
 config/version="0.9"
-run/main_scene="res://scenes/test_scene.tscn"
+run/main_scene="res://demo/test_scene.tscn"
 config/features=PackedStringArray("4.2", "GL Compatibility")
 config/icon="res://icon.svg"
 

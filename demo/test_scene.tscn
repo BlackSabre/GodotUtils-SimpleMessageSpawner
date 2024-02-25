@@ -1,6 +1,6 @@
 [gd_scene load_steps=3 format=3 uid="uid://ba6wm8fostiq2"]
 
-[ext_resource type="Script" path="res://scenes/test_scene.gd" id="1_wkgbj"]
+[ext_resource type="Script" path="res://demo/test_scene.gd" id="1_wkgbj"]
 [ext_resource type="PackedScene" uid="uid://duvoqu6yn558s" path="res://addons/simple_message_spawner/sms_message_spawner.tscn" id="2_gbyod"]
 
 [node name="TestScene" type="Node2D"]
