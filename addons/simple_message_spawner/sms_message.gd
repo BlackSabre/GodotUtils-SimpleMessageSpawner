@@ -92,7 +92,7 @@ func _input(event):
 
 
 func set_initial_modulations_and_textures():
-	image_texture_rect.self_modulate = start_image_modulation
+	#image_texture_rect.self_modulate = start_image_modulation
 	self_modulate.a = 0
 	message_rich_label.modulate.a = 0
 
@@ -179,7 +179,9 @@ func move(start_position: Vector2, change_colour: bool = false, use_tween_transi
 		self_modulate.a = 1
 		message_rich_label.modulate.a = 1
 		self_modulate = start_panel_container_modulation
-		message_rich_label.add_theme_color_override("font_color", start_text_colour)	
+		#message_rich_label.add_theme_color_override("font_color", start_text_colour)
+		message_rich_label.add_theme_color_override("default_color", start_text_colour)
+		
 		
 	is_moving = true
 	
@@ -200,7 +202,8 @@ func move(start_position: Vector2, change_colour: bool = false, use_tween_transi
 		colour_tween = create_tween()
 		colour_tween.set_parallel(true)		
 		colour_tween.tween_property(self, "self_modulate", message_config.to_panel_container_colour, message_config.change_duration)
-		colour_tween.tween_property(self.message_rich_label, "theme_override_colors/font_color", message_config.to_text_colour, message_config.change_duration)
+		colour_tween.tween_property(self.message_rich_label, "theme_override_colors/default_color", message_config.to_text_colour, message_config.change_duration)
+		#colour_tween.tween_property(self.message_rich_label, "theme_override_colors/font_color", message_config.to_text_colour, message_config.change_duration)
 	
 	if terminate_after == true:
 		move_tween.tween_callback(finish_move_and_delete).set_delay(message_config.move_duration)
