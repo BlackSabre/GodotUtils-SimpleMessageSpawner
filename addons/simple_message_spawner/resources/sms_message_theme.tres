@@ -1,4 +1,15 @@
-[gd_resource type="Theme" format=3 uid="uid://bce8trn6jgasu"]
+[gd_resource type="Theme" load_steps=3 format=3 uid="uid://bce8trn6jgasu"]
+
+[ext_resource type="Texture2D" uid="uid://c8al55wsgjp08" path="res://addons/simple_message_spawner/demo_ resources/images/panel.png" id="1_upe5g"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_twu3s"]
+texture = ExtResource("1_upe5g")
+texture_margin_left = 5.0
+texture_margin_top = 5.0
+texture_margin_right = 5.0
+texture_margin_bottom = 5.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
 
 [resource]
-PanelContainer/styles/panel = null
+PanelContainer/styles/panel = SubResource("StyleBoxTexture_twu3s")

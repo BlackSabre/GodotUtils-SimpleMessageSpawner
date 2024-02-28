@@ -7,6 +7,8 @@ signal displaying_paused(message: SMSMessage)
 signal delete_message
 signal resume_displaying(message: SMSMessage)
 
+@export var panel_container_style_box_texture: StyleBoxTexture
+
 ## Colour of the message panel container when created
 @export var start_panel_container_modulation: Color = Color.TRANSPARENT
 
@@ -93,7 +95,8 @@ func _input(event):
 
 func set_initial_modulations_and_textures():
 	#image_texture_rect.self_modulate = start_image_modulation
-	self_modulate.a = 0
+	self_modulate.a = 1
+	self["theme_override_styles/panel"] = panel_container_style_box_texture
 	message_rich_label.modulate.a = 0
 
 

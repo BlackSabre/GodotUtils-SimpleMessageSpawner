@@ -1,13 +1,22 @@
-[gd_scene load_steps=12 format=3 uid="uid://cb2b3a4e5w2mb"]
+[gd_scene load_steps=13 format=3 uid="uid://cb2b3a4e5w2mb"]
 
 [ext_resource type="Script" path="res://addons/simple_message_spawner/sms_message.gd" id="1_g28vo"]
-[ext_resource type="Theme" uid="uid://bce8trn6jgasu" path="res://addons/simple_message_spawner/resources/sms_message_theme.tres" id="1_lapq8"]
+[ext_resource type="Texture2D" uid="uid://c8al55wsgjp08" path="res://addons/simple_message_spawner/demo_ resources/images/panel.png" id="2_8xo5x"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/sms_message_move_config.gd" id="2_g5dls"]
 [ext_resource type="Texture2D" uid="uid://o331m2u5d005" path="res://addons/simple_message_spawner/demo_ resources/images/godotIconWink128x128.png" id="4_nkwy2"]
 
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_5ftdw"]
+texture = ExtResource("2_8xo5x")
+texture_margin_left = 5.0
+texture_margin_top = 5.0
+texture_margin_right = 5.0
+texture_margin_bottom = 5.0
+axis_stretch_horizontal = 1
+axis_stretch_vertical = 1
+
 [sub_resource type="Resource" id="Resource_i1up0"]
 script = ExtResource("2_g5dls")
-to_panel_container_colour = Color(0, 0, 0, 1)
+to_panel_container_colour = Color(1, 1, 1, 1)
 to_text_colour = Color(0.85098, 0, 0, 1)
 change_duration = 1.0
 move_duration = 1.0
@@ -83,8 +92,8 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 90.0
 grow_horizontal = 2
-theme = ExtResource("1_lapq8")
 script = ExtResource("1_g28vo")
+panel_container_style_box_texture = SubResource("StyleBoxTexture_5ftdw")
 start_text_colour = Color(0.745098, 0.745098, 0.745098, 0)
 display_message_config = SubResource("Resource_i1up0")
 exit_message_config = SubResource("Resource_w80ir")
