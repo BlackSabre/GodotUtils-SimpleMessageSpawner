@@ -52,7 +52,8 @@ var mouse_inside: bool = false
 var handling_mouse_click: bool = false
 var pause_displaying: bool = false
 var text: String
-var is_set_to_delete = false
+var is_set_to_delete: bool = false
+var panel_container_using_texture: bool = false
 
 var display_timer: Timer
 var test_orig_colour: Color
@@ -65,6 +66,11 @@ enum move_configs {
 func _ready():
 	set_initial_modulations_and_textures()
 	
+	var override_style = self["theme_override_styles/panel"]
+	print("Style: ", override_style)
+	if override_style is StyleBoxFlat:
+		print("Do this")
+	print("Style Type: ", typeof(override_style))
 	
 	display_timer = Timer.new()
 	add_child(display_timer)
@@ -79,7 +85,7 @@ func _ready():
 		mouse_filter = MOUSE_FILTER_STOP
 	else:
 		mouse_filter = MOUSE_FILTER_IGNORE
-	
+
 
 
 func _input(event):
@@ -96,7 +102,7 @@ func _input(event):
 func set_initial_modulations_and_textures():
 	#image_texture_rect.self_modulate = start_image_modulation
 	self_modulate.a = 1
-	self["theme_override_styles/panel"] = panel_container_style_box_texture
+	#self["theme_override_styles/panel"] = panel_container_style_box_texture
 	message_rich_label.modulate.a = 0
 
 
@@ -204,7 +210,7 @@ func move(start_position: Vector2, change_colour: bool = false, use_tween_transi
 	if change_colour == true:
 		colour_tween = create_tween()
 		colour_tween.set_parallel(true)		
-		colour_tween.tween_property(self, "self_modulate", message_config.to_panel_container_colour, message_config.change_duration)
+		colour_tween.tween_property(self, "self_modulate", message_config.to_panel_container_colour, message_config.change_duration)		
 		colour_tween.tween_property(self.message_rich_label, "theme_override_colors/default_color", message_config.to_text_colour, message_config.change_duration)
 		#colour_tween.tween_property(self.message_rich_label, "theme_override_colors/font_color", message_config.to_text_colour, message_config.change_duration)
 	
@@ -270,8 +276,14 @@ func _on_mouse_entered():
 	#	return
 	
 	print("Mouse entered message: ", get_text())
-	test_orig_colour = modulate
-	modulate = Color.CHARTREUSE
+	if panel_container_using_texture == false:
+		self.self_modulate = panel_highlight_colour
+	
+	message_rich_label["theme_override_colors/default_color"] = text_highlight_colour
+	
+	panel_container_using_texture
+	#test_orig_colour = modulate
+	#modulate = Color.CHARTREUSE
 	display_timer.stop()
 	mouse_inside = true
 	pause_displaying = true
@@ -283,7 +295,12 @@ func _on_mouse_exited():
 	
 	print("Mouse exited message: ", get_text())
 	mouse_inside = false
-	modulate = test_orig_colour
+	
+	if panel_container_using_texture == false:
+		self.self_modulate = display_message_config.to_panel_container_colour
+	
+	message_rich_label["theme_override_colors/default_color"] = display_message_config.to_text_colour
+	
 	display_timer.start(display_time)
 
 
