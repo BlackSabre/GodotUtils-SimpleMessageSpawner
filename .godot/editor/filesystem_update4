@@ -2,3 +2,4 @@ res://demo/test_scene.tscn
 res://addons/simple_message_spawner/sms_message_spawner.tscn
 res://addons/simple_message_spawner/sms_message.tscn
 res://addons/simple_message_spawner/sms_message.gd
+res://addons/simple_message_spawner/resources/sms_message_theme.tres

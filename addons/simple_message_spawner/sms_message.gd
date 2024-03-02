@@ -54,23 +54,32 @@ var pause_displaying: bool = false
 var text: String
 var is_set_to_delete: bool = false
 var panel_container_using_texture: bool = false
+var has_theme: bool = false
 
 var display_timer: Timer
 var test_orig_colour: Color
 
-enum move_configs {
-	DISPLAY_CONFIG,
-	EXIT_CONFIG,
+enum theme_override_type {
+	NO_OVERRIDE,
+	STYLEBOX_EMPTY,
+	STYLEBOX_TEXTURE,
+	STYLEBOX_FLAT,
+	STYLEBOX_LINE,
 }
 
 func _ready():
 	set_initial_modulations_and_textures()
 	
-	var override_style = self["theme_override_styles/panel"]
-	print("Style: ", override_style)
-	if override_style is StyleBoxFlat:
+	if theme != null:
+		print("Has theme")
+		has_theme = true;
+	
+	var theme_override_style = self["theme_override_styles/panel"]
+	
+	#print("Style: ", theme_override_style)
+	if theme_override_style is StyleBoxFlat:
 		print("Do this")
-	print("Style Type: ", typeof(override_style))
+	#print("Style Type: ", typeof(theme_override_style))
 	
 	display_timer = Timer.new()
 	add_child(display_timer)
