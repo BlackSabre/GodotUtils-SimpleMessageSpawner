@@ -1,4 +1,4 @@
-[gd_scene load_steps=16 format=3 uid="uid://cb2b3a4e5w2mb"]
+[gd_scene load_steps=17 format=3 uid="uid://cb2b3a4e5w2mb"]
 
 [ext_resource type="Theme" uid="uid://bce8trn6jgasu" path="res://addons/simple_message_spawner/resources/sms_message_theme.tres" id="1_dwnds"]
 [ext_resource type="Texture2D" uid="uid://d070pybslkp5p" path="res://addons/simple_message_spawner/demo_ resources/images/panel_highlighted.png" id="1_mn7jv"]
@@ -6,6 +6,7 @@
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/sms_message_move_config.gd" id="2_g5dls"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/sms_message.gd" id="2_vnlh0"]
 [ext_resource type="Texture2D" uid="uid://o331m2u5d005" path="res://addons/simple_message_spawner/demo_ resources/images/godotIconWink128x128.png" id="4_nkwy2"]
+[ext_resource type="Script" path="res://addons/simple_message_spawner/resources/test_fields_inspector.gd" id="7_tgrgn"]
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_5ftdw"]
 texture = ExtResource("2_8xo5x")
@@ -171,6 +172,17 @@ libraries = {
 "": SubResource("AnimationLibrary_2lpqs")
 }
 autoplay = "godot_icon_wink"
+
+[node name="TestFields" type="Control" parent="." node_paths=PackedStringArray("g1_arr_custom_objects")]
+layout_mode = 2
+script = ExtResource("7_tgrgn")
+ICON = null
+test2 = null
+g0_enum = 1
+g0_a_directory = ""
+g1_arr_custom_objects = [null]
+g1_range = 0
+g2_collision_layer = 1
 
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

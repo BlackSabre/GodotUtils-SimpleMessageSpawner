@@ -74,7 +74,7 @@ func _ready():
 	set_initial_modulations_and_textures()
 	check_themes()
 		
-	display_timer = Timer.new()	
+	display_timer = Timer.new()
 	add_child(display_timer)
 	display_timer.autostart = false
 	
@@ -298,7 +298,6 @@ func _on_mouse_entered():
 	if has_theme == true && panel_container_highlight_style_box_texture != null:
 		print("Changing theme")
 		self["theme_override_styles/panel"] = panel_container_highlight_style_box_texture
-		
 	
 	#message_rich_label["theme_override_colors/default_color"] = text_highlight_colour
 	
