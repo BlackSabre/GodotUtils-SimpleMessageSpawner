@@ -58,6 +58,10 @@ var panel_container_using_texture: bool = false
 var has_theme: bool = false
 var has_override_theme: bool = false
 var theme_override_type: ThemeOverrideType = ThemeOverrideType.NO_OVERRIDE
+var original_style_box_texture_override: StyleBoxTexture
+var original_style_box_flat_override: StyleBoxFlat
+var original_style_box_empty_override: StyleBoxEmpty
+var original_style_box_line_override: StyleBoxLine
 
 var display_timer: Timer
 var test_orig_colour: Color
@@ -295,7 +299,9 @@ func _on_mouse_entered():
 	if handle_mouse_clicks == false:
 		return
 	
-	if has_theme == true && panel_container_highlight_style_box_texture != null:
+	if has_override_theme == true:
+		pass
+	elif has_theme == true && panel_container_highlight_style_box_texture != null:
 		print("Changing theme")
 		self["theme_override_styles/panel"] = panel_container_highlight_style_box_texture
 	
