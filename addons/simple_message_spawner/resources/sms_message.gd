@@ -58,10 +58,7 @@ var panel_container_using_texture: bool = false
 var has_theme: bool = false
 var has_override_theme: bool = false
 var theme_override_type: ThemeOverrideType = ThemeOverrideType.NO_OVERRIDE
-var original_style_box_texture_override: StyleBoxTexture
-var original_style_box_flat_override: StyleBoxFlat
-var original_style_box_empty_override: StyleBoxEmpty
-var original_style_box_line_override: StyleBoxLine
+var original_style_box_override: StyleBox
 
 var display_timer: Timer
 var test_orig_colour: Color
@@ -118,6 +115,8 @@ func check_themes():
 	if theme_override_style != null:
 		print("Has override theme")
 		has_override_theme = true
+	
+	original_style_box_override = theme_override_style
 	
 	if theme_override_style is StyleBoxTexture:
 		print("Do this to StyleBoxTexture")
@@ -300,14 +299,15 @@ func _on_mouse_entered():
 		return
 	
 	if has_override_theme == true:
-		pass
+		print("Has override theme")
+		self["theme_override_styles/panel"] = panel_container_highlight_style_box_texture
 	elif has_theme == true && panel_container_highlight_style_box_texture != null:
 		print("Changing theme")
 		self["theme_override_styles/panel"] = panel_container_highlight_style_box_texture
 	
 	#message_rich_label["theme_override_colors/default_color"] = text_highlight_colour
 	
-	panel_container_using_texture
+	#panel_container_using_texture
 	#test_orig_colour = modulate
 	#modulate = Color.CHARTREUSE
 	display_timer.stop()
@@ -321,6 +321,10 @@ func _on_mouse_exited():
 	
 	print("Mouse exited message: ", get_text())
 	mouse_inside = false
+	
+	if has_override_theme == true:
+		print("Has override theme")
+		self["theme_override_styles/panel"] = original_style_box_override
 	
 	if panel_container_using_texture == false:
 		self.self_modulate = display_message_config.to_panel_container_colour

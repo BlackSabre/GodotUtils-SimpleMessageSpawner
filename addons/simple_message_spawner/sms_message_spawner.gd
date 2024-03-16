@@ -84,7 +84,7 @@ func process_message_move_array():
 		#return
 	
 	
-	#print("PMMA: Processing new action: ", message_action.get_action_type_string())
+	#print("PMMA: Processing new actio6n: ", message_action.get_action_type_string())
 	#print("PMMA: Messages on screen size: ", messages_on_screen.size())
 	
 	if ((message_action.get_action_type() == SMSMessageAction.ActionType.INITIAL_PROCESS_MESSAGES ||
@@ -157,6 +157,9 @@ func add_and_configure_message_object() -> SMSMessage:
 	var message: SMSMessage = message_scene.instantiate()
 	add_child(message)
 	
+	if message_screen_position == MessageScreenPosition.TOP:
+		message.position.y = 0 - message.size.y
+	
 	message.finished_displaying.connect(on_message_finished_displaying.bind(message))	
 	message.set_label_text(message_text)
 	
@@ -183,6 +186,7 @@ func move_message_initial(message: SMSMessage):
 	is_doing_message_initial_move = true
 	message.z_index = -1
 	var start_position: Vector2 = get_message_start_position(message)
+	#var start_position: Vector2 = Vector2(0,30)
 	var target_position: Vector2 = get_message_target_position(message)
 	
 	message.set_display_config_target_position(target_position)
@@ -395,7 +399,7 @@ func get_message_start_position(message: SMSMessage) -> Vector2:
 			start_position_y = message.position.y
 		elif message_source_direction == MessageMoveDirection.RIGHT:
 			start_position_x = message.position.x + message.size.x
-			start_position_y = message.position.y
+			start_position_y = 0
 	elif message_screen_position == MessageScreenPosition.BOTTOM:
 		if message_source_direction == MessageMoveDirection.TOP:
 			start_position_x = message.position.x
@@ -473,7 +477,7 @@ func get_message_target_position(message: SMSMessage) -> Vector2:
 		return Vector2(message.position)
 	elif message_screen_position == MessageScreenPosition.TOP:
 		target_position_x = message.position.x
-		target_position_y = message.position.y
+		target_position_y = 0#message.size.y#message.position.y
 	elif message_screen_position == MessageScreenPosition.BOTTOM:
 		target_position_x = message.position.x
 		target_position_y = message.position.y - message.size.y

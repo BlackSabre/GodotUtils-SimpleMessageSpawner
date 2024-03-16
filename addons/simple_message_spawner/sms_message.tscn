@@ -1,47 +1,26 @@
-[gd_scene load_steps=16 format=3 uid="uid://cb2b3a4e5w2mb"]
+[gd_scene load_steps=11 format=3 uid="uid://cb2b3a4e5w2mb"]
 
-[ext_resource type="Theme" uid="uid://bce8trn6jgasu" path="res://addons/simple_message_spawner/resources/sms_message_theme.tres" id="1_dwnds"]
-[ext_resource type="Texture2D" uid="uid://d070pybslkp5p" path="res://addons/simple_message_spawner/demo_ resources/images/panel_highlighted.png" id="1_mn7jv"]
-[ext_resource type="Texture2D" uid="uid://c8al55wsgjp08" path="res://addons/simple_message_spawner/demo_ resources/images/panel.png" id="2_8xo5x"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/sms_message_move_config.gd" id="2_g5dls"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/sms_message.gd" id="2_vnlh0"]
 [ext_resource type="Texture2D" uid="uid://o331m2u5d005" path="res://addons/simple_message_spawner/demo_ resources/images/godotIconWink128x128.png" id="4_nkwy2"]
 
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_5ftdw"]
-texture = ExtResource("2_8xo5x")
-texture_margin_left = 5.0
-texture_margin_top = 5.0
-texture_margin_right = 5.0
-texture_margin_bottom = 5.0
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
-[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_yrcme"]
-texture = ExtResource("1_mn7jv")
-texture_margin_left = 5.0
-texture_margin_top = 5.0
-texture_margin_right = 5.0
-texture_margin_bottom = 5.0
-axis_stretch_horizontal = 1
-axis_stretch_vertical = 1
-
 [sub_resource type="Resource" id="Resource_i1up0"]
 script = ExtResource("2_g5dls")
-to_panel_container_colour = Color(0.254902, 0.254902, 0.254902, 1)
-to_text_colour = Color(0.85098, 0, 0, 1)
+to_panel_container_colour = Color(0, 0.964706, 0.0901961, 1)
+to_text_colour = Color(0, 0, 0, 1)
 change_duration = 1.0
 move_duration = 1.0
-move_tween_transition_type = 8
+move_tween_transition_type = 0
 move_tween_ease_type = 0
-change_tween_transition_type = 0
+change_tween_transition_type = 6
 change_tween_ease_type = 0
 
 [sub_resource type="Resource" id="Resource_w80ir"]
 script = ExtResource("2_g5dls")
 to_panel_container_colour = Color(1, 1, 1, 0)
 to_text_colour = Color(1, 1, 1, 0)
-change_duration = 1.0
-move_duration = 1.0
+change_duration = 3.0
+move_duration = 3.0
 move_tween_transition_type = 7
 move_tween_ease_type = 0
 change_tween_transition_type = 0
@@ -103,16 +82,14 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 90.0
 grow_horizontal = 2
-theme = ExtResource("1_dwnds")
-theme_override_styles/panel = SubResource("StyleBoxTexture_5ftdw")
 script = ExtResource("2_vnlh0")
-panel_container_highlight_style_box_texture = SubResource("StyleBoxTexture_yrcme")
-start_text_colour = Color(0.745098, 0.745098, 0.745098, 0)
+start_panel_container_modulation = Color(1, 0, 0.301961, 1)
+start_text_colour = Color(0.623529, 0.741176, 1, 1)
 text_highlight_colour = Color(0.207843, 0.513726, 0.207843, 1)
 panel_highlight_colour = Color(0, 1, 1, 1)
 display_message_config = SubResource("Resource_i1up0")
 exit_message_config = SubResource("Resource_w80ir")
-display_time = 4.0
+display_time = 8.0
 handle_mouse_clicks = true
 
 [node name="MessageSound" type="AudioStreamPlayer" parent="."]
