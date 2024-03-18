@@ -84,7 +84,10 @@ func process_message_move_array():
 		#return
 	
 	
-	#print("PMMA: Processing new actio6n: ", message_action.get_action_type_string())
+	if (message_action.message != null):
+		print("PMMA: Processing new action: ", message_action.get_action_type_string(), "  ", message_action.message.get_text())
+	else:
+		print("PMMA: Processing new action: ", message_action.get_action_type_string())
 	#print("PMMA: Messages on screen size: ", messages_on_screen.size())
 	
 	if ((message_action.get_action_type() == SMSMessageAction.ActionType.INITIAL_PROCESS_MESSAGES ||
@@ -97,6 +100,11 @@ func process_message_move_array():
 		return
 	
 	await message_action.run_action()
+	
+	if (message_action.message != null):
+		print("PMMA: Finished new action: ", message_action.get_action_type_string(), "  ", message_action.message.get_text())
+	else:
+		print("PMMA: Finished new action: ", message_action.get_action_type_string())
 	#print("PMMA: Finished processing new action: ", message_action.get_action_type_string())
 	
 	is_processing_message_move_array = false
@@ -157,18 +165,20 @@ func add_and_configure_message_object() -> SMSMessage:
 	var message: SMSMessage = message_scene.instantiate()
 	add_child(message)
 	
-	if message_screen_position == MessageScreenPosition.TOP:
-		message.position.y = 0 - message.size.y
-	
 	message.finished_displaying.connect(on_message_finished_displaying.bind(message))	
 	message.set_label_text(message_text)
 	
 	set_anchors(message, message_screen_position)
 	
+	if message_screen_position == MessageScreenPosition.TOP:
+		message.position.y = -message.size.y
+	elif message_screen_position == MessageScreenPosition.BOTTOM:
+		message.position.y = get_viewport().size.y + message.size.y
+	
 	# Need to wait until next frame so the message size & positions properties are updated
 	await get_tree().process_frame
 	
-	set_none_position(message)
+	#set_none_position(message)
 	message.z_index = 0
 	
 	await get_tree().process_frame
@@ -227,6 +237,7 @@ func move_message_off_screen(message: SMSMessage):
 		messages_on_screen.remove_at(message_index)
 	
 	is_moving_message_off_screen = false
+	delete_message(message)
 	#print("MMOS: Finished moving message off screen: ", message.get_text())
 
 
@@ -258,7 +269,7 @@ func reorder_messages_at_top_of_screen(message: SMSMessage, ignore_first_message
 	
 	var current_message_index = messages_on_screen.size() - 1
 	var y_position: float = 0
-	
+
 	if ignore_first_message == true:
 		# leaves space for message to move in 
 		y_position = message.size.y
@@ -335,11 +346,11 @@ func on_message_finished_displaying(message: SMSMessage):
 	
 	#print("OMFD: Message: ", message.get_text(), " has finished moving and reordering. Deleting...")
 	
-	add_to_message_action_array(func(): await delete_message(message), SMSMessageAction.ActionType.MESSAGE_DELETE, message)	
+	#add_to_message_action_array(func(): await delete_message(message), SMSMessageAction.ActionType.MESSAGE_DELETE, message)	
 	#await process_message_move_array()
 	
 	add_to_message_action_array(func(): await process_messages(), SMSMessageAction.ActionType.PROCESS_MESSAGES)
-	
+		
 	#print("OMFD: Finished...?")
 	process_message_move_array()
 
@@ -382,13 +393,16 @@ func get_message_start_position(message: SMSMessage) -> Vector2:
 	var start_position_y: float
 	var start_position: Vector2
 	
-	if message_source_direction == MessageMoveDirection.NONE:
-		return Vector2(message.position)
+	if message_source_direction == MessageMoveDirection.NONE:		
+		pass
+		#return Vector2(message.position.x, 0)
 	
 	# There's a way to do tbe below in fewer lines, but I find this more readable and 
-	# I doubt it takes much more time to process if there is any difference at all
+	# I doubt it takes much more time to process
 	if message_screen_position == MessageScreenPosition.TOP:
-		if message_source_direction == MessageMoveDirection.TOP:
+		if message_source_direction == MessageMoveDirection.NONE:
+			return Vector2(message.position.x, 0)
+		elif message_source_direction == MessageMoveDirection.TOP:
 			start_position_x = message.position.x
 			start_position_y = message.position.y - message.size.y
 		elif message_source_direction == MessageMoveDirection.BOTTOM:
@@ -396,26 +410,55 @@ func get_message_start_position(message: SMSMessage) -> Vector2:
 			start_position_y = viewport_size.y + message.size.y
 		elif message_source_direction == MessageMoveDirection.LEFT:
 			start_position_x = message.position.x - message.size.x
-			start_position_y = message.position.y
+			start_position_y = 0
 		elif message_source_direction == MessageMoveDirection.RIGHT:
 			start_position_x = message.position.x + message.size.x
 			start_position_y = 0
 	elif message_screen_position == MessageScreenPosition.BOTTOM:
-		if message_source_direction == MessageMoveDirection.TOP:
+		if message_source_direction == MessageMoveDirection.NONE:
 			start_position_x = message.position.x
-			start_position_y = 0 - message.size.y
+			start_position_y = viewport_size.y - message.size.y
+		elif message_source_direction == MessageMoveDirection.TOP:
+			start_position_x = message.position.x
+			start_position_y = -message.size.y
 		elif message_source_direction == MessageMoveDirection.BOTTOM:
 			start_position_x = message.position.x
 			start_position_y = message.position.y + message.size.y
 		elif message_source_direction == MessageMoveDirection.LEFT:
 			start_position_x = message.position.x - message.size.x
-			start_position_y = message.position.y - message.size.y
+			start_position_y = viewport_size.y - message.size.y
 		elif message_source_direction == MessageMoveDirection.RIGHT:
 			start_position_x = message.position.x + message.size.x
-			start_position_y = message.position.y - message.size.y
+			start_position_y = viewport_size.y - message.size.y
 	
 	start_position = Vector2(start_position_x, start_position_y)
+	print("Start position: ", start_position)
 	return start_position
+
+
+# The target position should be pretty much the same as when we instantiate it because
+# of the anchors. However, when the messages have anchors at the bottom of the 
+# screen, they need to be moved up by their size first unless the
+# message_source_direction value is NONE
+func get_message_target_position(message: SMSMessage) -> Vector2:	
+	var viewport_size = get_viewport().get_visible_rect().size
+	var target_position_x: float
+	var target_position_y: float
+	var target_position: Vector2
+	
+	#if message_source_direction == MessageMoveDirection.NONE:
+		#return Vector2(message.position.x, 0)	
+	if message_screen_position == MessageScreenPosition.TOP:
+		target_position_x = message.position.x
+		target_position_y = 0 #message.size.y#message.position.y
+	elif message_screen_position == MessageScreenPosition.BOTTOM:
+		target_position_x = message.position.x
+		target_position_y = viewport_size.y - message.size.y
+		
+	
+	target_position = Vector2(target_position_x, target_position_y)
+	
+	return target_position
 
 
 # The position where a message goes off-screen. We just calculate the offset based
@@ -463,32 +506,9 @@ func get_message_exit_position(message: SMSMessage) -> Vector2:
 	return exit_position
 
 
-# The target position should be pretty much the same as when we instantiate it because
-# of the anchors. However, when the messages have anchors at the bottom of the 
-# screen, they need to be moved up by their size first unless the
-# message_source_direction value is NONE
-func get_message_target_position(message: SMSMessage) -> Vector2:	
-	var viewport_size = get_viewport().get_visible_rect().size
-	var target_position_x: float
-	var target_position_y: float
-	var target_position: Vector2
-	
-	if message_source_direction == MessageMoveDirection.NONE:
-		return Vector2(message.position)
-	elif message_screen_position == MessageScreenPosition.TOP:
-		target_position_x = message.position.x
-		target_position_y = 0#message.size.y#message.position.y
-	elif message_screen_position == MessageScreenPosition.BOTTOM:
-		target_position_x = message.position.x
-		target_position_y = message.position.y - message.size.y
-	
-	target_position = Vector2(target_position_x, target_position_y)
-	return target_position
-
-
 # Sets the position of the message if it is not set to move from anywhere off-screen
 func set_none_position(message: SMSMessage):
 	if (message_source_direction == MessageMoveDirection.NONE &&
 			message_screen_position == MessageScreenPosition.BOTTOM):
 		var viewport_size: Vector2 = get_viewport().get_visible_rect().size
-		message.position.y = viewport_size.y - message.size.y
+		message.position.y = viewport_size.y + message.size.y

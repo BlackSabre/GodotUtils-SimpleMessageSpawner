@@ -62,6 +62,9 @@ var original_style_box_override: StyleBox
 
 var display_timer: Timer
 var test_orig_colour: Color
+var current_move_tween: Tween
+var current_colour_tween: Tween
+
 
 enum ThemeOverrideType {
 	NO_OVERRIDE,
@@ -226,12 +229,15 @@ func move(start_position: Vector2, change_colour: bool = false, use_tween_transi
 	move_tween.set_parallel(true)
 	if use_tween_transition_and_ease == true:
 		move_tween.tween_property(self, "position",
-				message_config.target_position,message_config.move_duration).set_trans(
+				message_config.target_position, 
+				message_config.move_duration).set_trans(
 				message_config.move_tween_transition_type).set_ease(
 				message_config.move_tween_ease_type)
 	else: 
 		move_tween.tween_property(self, "position", 
 				message_config.target_position, message_config.move_duration)
+	
+	current_move_tween = move_tween
 	
 	if change_colour == true:
 		colour_tween = create_tween()
@@ -239,6 +245,8 @@ func move(start_position: Vector2, change_colour: bool = false, use_tween_transi
 		colour_tween.tween_property(self, "self_modulate", message_config.to_panel_container_colour, message_config.change_duration)		
 		colour_tween.tween_property(self.message_rich_label, "theme_override_colors/default_color", message_config.to_text_colour, message_config.change_duration)
 		#colour_tween.tween_property(self.message_rich_label, "theme_override_colors/font_color", message_config.to_text_colour, message_config.change_duration)
+		current_colour_tween = colour_tween
+	
 	
 	if terminate_after == true:
 		move_tween.tween_callback(finish_move_and_delete).set_delay(message_config.move_duration)
@@ -286,8 +294,16 @@ func finish_move():
 
 # Called after a move and when it's set to delete
 func finish_move_and_delete():
-	#print("Moving finished. Deleting")
+	print("Moving finished. Deleting ", get_text())
 	is_moving = false
+	
+	print("current_colour_tween: ", current_colour_tween)
+	
+	if current_colour_tween != null && current_colour_tween.is_running():
+		print("waiting for colours: ", Time.get_datetime_string_from_system())
+		await current_colour_tween.finished
+		print("Finished waitiing for colours: ", Time.get_datetime_string_from_system())
+	
 	moving_finished.emit()
 	delete_message.emit()
 	handling_mouse_click = false
@@ -299,10 +315,10 @@ func _on_mouse_entered():
 		return
 	
 	if has_override_theme == true:
-		print("Has override theme")
+		#print("Has override theme")
 		self["theme_override_styles/panel"] = panel_container_highlight_style_box_texture
 	elif has_theme == true && panel_container_highlight_style_box_texture != null:
-		print("Changing theme")
+		#print("Changing theme")
 		self["theme_override_styles/panel"] = panel_container_highlight_style_box_texture
 	
 	#message_rich_label["theme_override_colors/default_color"] = text_highlight_colour
@@ -319,11 +335,11 @@ func _on_mouse_exited():
 	if handle_mouse_clicks == false:
 		return
 	
-	print("Mouse exited message: ", get_text())
+	#print("Mouse exited message: ", get_text())
 	mouse_inside = false
 	
 	if has_override_theme == true:
-		print("Has override theme")
+		#print("Has override theme")
 		self["theme_override_styles/panel"] = original_style_box_override
 	
 	if panel_container_using_texture == false:
