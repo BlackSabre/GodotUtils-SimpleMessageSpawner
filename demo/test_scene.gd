@@ -7,7 +7,7 @@ var test: bool = true
 var arr: Array[Callable]
 
 # Called when the node enters the scene tree for the first time.
-func _ready():
+func _ready() -> void:
 	if test == true:
 		test_messages()
 		
@@ -18,7 +18,7 @@ func _ready():
 	#for item in arr:
 		#await item.call()
 
-func test_messages():
+func test_messages() -> void:
 	#await get_tree().create_timer(.5).timeout
 	#message_spawner.add_message("1. This is a message")
 	#
@@ -68,6 +68,3 @@ func test_messages():
 	#message_spawner.add_message("20.")
 
 
-func test_mess(num: int):
-	await get_tree().create_timer(1).timeout
-	#print("Test ", num, " finished")
