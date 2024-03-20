@@ -7,13 +7,13 @@
 [sub_resource type="Resource" id="Resource_i1up0"]
 script = ExtResource("2_g5dls")
 to_panel_container_colour = Color(0, 0.964706, 0.0901961, 1)
-to_text_colour = Color(0, 0, 0, 1)
+to_text_colour = null
 change_duration = 0.4
 move_duration = 0.4
 move_tween_transition_type = 0
-move_tween_ease_type = 0
+move_tween_ease_type = null
 change_tween_transition_type = 6
-change_tween_ease_type = 0
+change_tween_ease_type = null
 
 [sub_resource type="Resource" id="Resource_w80ir"]
 script = ExtResource("2_g5dls")
@@ -21,10 +21,10 @@ to_panel_container_colour = Color(0.788235, 0, 0.788235, 1)
 to_text_colour = Color(0, 0, 0, 0)
 change_duration = 0.4
 move_duration = 0.4
-move_tween_transition_type = 7
-move_tween_ease_type = 0
-change_tween_transition_type = 0
-change_tween_ease_type = 0
+move_tween_transition_type = null
+move_tween_ease_type = null
+change_tween_transition_type = null
+change_tween_ease_type = null
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_v8hbb"]
 atlas = ExtResource("4_nkwy2")
@@ -135,6 +135,11 @@ autowrap_mode = 2
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
+theme_override_colors/font_shadow_color = Color(0, 0.913725, 0, 1)
+theme_override_colors/font_outline_color = Color(1, 0, 0, 1)
+theme_override_constants/shadow_offset_y = 10
+theme_override_constants/shadow_outline_size = 5
+theme_override_constants/outline_size = 10
 theme_override_fonts/normal_font = SubResource("FontFile_dvrij")
 bbcode_enabled = true
 text = "fafdssfdafdsfsdfsdasdjfkhjskdahjklhsadlkh gfdgdfsgdf

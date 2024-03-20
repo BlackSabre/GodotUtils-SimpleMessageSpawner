@@ -1,9 +1,7 @@
 extends Resource
 class_name SMSMessageMoveConfig
 
-@export var to_panel_container_colour: Color
-
-@export var to_text_colour: Color
+@export var to_colour_config: SMSMessageColourConfig
 
 @export var change_duration: float
 

@@ -7,6 +7,10 @@ signal displaying_paused(message: SMSMessage)
 signal delete_message
 signal resume_displaying(message: SMSMessage)
 
+@export var start_colour_config: SMSMessageColourConfig
+
+@export var highlight_colour_config: SMSMessageColourConfig
+
 ## Texture used to highlight the panel when hovered over
 @export var panel_container_highlight_style_box_texture: StyleBox
 
@@ -144,7 +148,7 @@ func handle_mouse_click():
 		return
 	
 	handling_mouse_click = true
-	print("clickckkc")
+	print("Clicked on message. Currently doing nothing.")
 	handling_mouse_click = false
 
 
@@ -244,9 +248,7 @@ func move(start_position: Vector2, change_colour: bool = false, use_tween_transi
 		colour_tween.set_parallel(true)		
 		colour_tween.tween_property(self, "self_modulate", message_config.to_panel_container_colour, message_config.change_duration)		
 		colour_tween.tween_property(self.message_rich_label, "theme_override_colors/default_color", message_config.to_text_colour, message_config.change_duration)
-		#colour_tween.tween_property(self.message_rich_label, "theme_override_colors/font_color", message_config.to_text_colour, message_config.change_duration)
-		current_colour_tween = colour_tween
-	
+		current_colour_tween = colour_tween	
 	
 	if terminate_after == true:
 		move_tween.tween_callback(finish_move_and_delete).set_delay(message_config.move_duration)
@@ -257,13 +259,11 @@ func move(start_position: Vector2, change_colour: bool = false, use_tween_transi
 # moves this object to the target position using exit_message_config and deletes it 
 # afterwards
 func move_and_delete(target_position: Vector2, change_colour: bool):
-	#print("In Message: Move and delete")
 	if is_moving == true:
 		await moving_finished
 	
 	
 	exit_message_config.target_position = target_position
-	#print("In Message: Move!!!!")
 	move(position, true, true, exit_message_config, true, false)
 	
 	await delete_message
@@ -277,11 +277,7 @@ func display():
 	
 	await get_tree().create_timer(display_time).timeout
 	
-	#if is_moving == true:
-		#await moving_finished
-	
 	if pause_displaying == false:
-		#print("Emitting finished displaying")
 		finished_displaying.emit()
 		is_displaying = false
 

@@ -1,5 +1,7 @@
-res://addons/simple_message_spawner/sms_message_spawner.tscn
-res://addons/simple_message_spawner/sms_message_spawner.gd
-res://demo/test_scene.tscn
 res://addons/simple_message_spawner/sms_message.tscn
-res://demo/test_scene.gd
+res://addons/simple_message_spawner/resources/sms_message.gd
+res://demo/test_scene.tscn
+res://addons/simple_message_spawner/sms_message_spawner.tscn
+res://addons/simple_message_spawner/resources/sms_message_colour_config.gd
+res://addons/simple_message_spawner/resources/sms_message_move_config.gd
+res://addons/simple_message_spawner/resources/sms_message_theme.tres
