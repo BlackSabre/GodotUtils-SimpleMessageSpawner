@@ -6,25 +6,21 @@
 
 [sub_resource type="Resource" id="Resource_i1up0"]
 script = ExtResource("2_g5dls")
-to_panel_container_colour = Color(0, 0.964706, 0.0901961, 1)
-to_text_colour = null
 change_duration = 0.4
 move_duration = 0.4
 move_tween_transition_type = 0
-move_tween_ease_type = null
+move_tween_ease_type = 0
 change_tween_transition_type = 6
-change_tween_ease_type = null
+change_tween_ease_type = 0
 
 [sub_resource type="Resource" id="Resource_w80ir"]
 script = ExtResource("2_g5dls")
-to_panel_container_colour = Color(0.788235, 0, 0.788235, 1)
-to_text_colour = Color(0, 0, 0, 0)
 change_duration = 0.4
 move_duration = 0.4
-move_tween_transition_type = null
-move_tween_ease_type = null
-change_tween_transition_type = null
-change_tween_ease_type = null
+move_tween_transition_type = 7
+move_tween_ease_type = 0
+change_tween_transition_type = 0
+change_tween_ease_type = 0
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_v8hbb"]
 atlas = ExtResource("4_nkwy2")

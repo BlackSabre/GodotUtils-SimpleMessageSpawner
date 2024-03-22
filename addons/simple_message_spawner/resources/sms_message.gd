@@ -7,9 +7,18 @@ signal displaying_paused(message: SMSMessage)
 signal delete_message
 signal resume_displaying(message: SMSMessage)
 
+## Starting colour configuration of a message
 @export var start_colour_config: SMSMessageColourConfig
 
+## Highlight colour configuration of a message
 @export var highlight_colour_config: SMSMessageColourConfig
+
+## Config for when messages move out of the way of other messages.
+@export var reorder_move_colour_config: SMSMessageMoveConfig
+
+
+
+
 
 ## Texture used to highlight the panel when hovered over
 @export var panel_container_highlight_style_box_texture: StyleBox
