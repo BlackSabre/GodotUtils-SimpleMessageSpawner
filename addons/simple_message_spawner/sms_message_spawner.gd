@@ -177,7 +177,8 @@ func move_message_initial(message: SMSMessage):
 	var target_position: Vector2 = get_message_target_position(message)
 	
 	message.set_display_config_target_position(target_position)
-	message.move(start_position, true, true, message.display_message_config, false, true)
+	#message.move(start_position, true, true, message.display_message_config, false, true)
+	message.move(SMSMessage.SMSMessageConfigType.DISPLAY, false)
 	
 	await message.moving_finished
 	
@@ -251,7 +252,8 @@ func reorder_messages_at_top_of_screen(message: SMSMessage, ignore_first_message
 		var current_message = messages_on_screen[current_message_index]
 		var target_position := Vector2(current_message.position.x, y_position)
 		current_message.set_display_config_target_position(target_position)
-		current_message.move(current_message.position)
+		#current_message.move(current_message.position)
+		current_message.move(SMSMessage.SMSMessageConfigType.DISPLAY, false)
 		y_position += current_message.size.y
 		current_message_index -= 1
 	
@@ -275,7 +277,8 @@ func reorder_messages_at_bottom_of_screen(message: SMSMessage, ignore_first_mess
 		var current_message = messages_on_screen[current_message_index]
 		var target_position := Vector2(current_message.position.x, y_position)
 		current_message.set_display_config_target_position(target_position)
-		current_message.move(current_message.position)
+		#current_message.move(current_message.position)
+		current_message.move(SMSMessage.SMSMessageConfigType.DISPLAY, false)
 		y_position -= current_message.size.y
 		current_message_index -= 1
 	
