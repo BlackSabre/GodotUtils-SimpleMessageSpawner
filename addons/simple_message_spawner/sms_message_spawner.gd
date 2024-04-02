@@ -176,6 +176,9 @@ func move_message_initial(message: SMSMessage):
 	var start_position: Vector2 = get_message_start_position(message)
 	var target_position: Vector2 = get_message_target_position(message)
 	
+	message.visible = true
+	message.position = start_position
+	
 	message.set_display_config_target_position(target_position)
 	#message.move(start_position, true, true, message.display_message_config, false, true)
 	message.move(SMSMessage.SMSMessageConfigType.DISPLAY, false)
@@ -363,7 +366,8 @@ func get_message_start_position(message: SMSMessage) -> Vector2:
 	# I doubt it takes much more time to process
 	if message_screen_position == MessageScreenPosition.TOP:
 		if message_source_direction == MessageMoveDirection.NONE:
-			return Vector2(message.position.x, 0)
+			start_position_x = message.position.x
+			start_position_y = 0
 		elif message_source_direction == MessageMoveDirection.TOP:
 			start_position_x = message.position.x
 			start_position_y = message.position.y - message.size.y
@@ -403,7 +407,7 @@ func get_message_target_position(message: SMSMessage) -> Vector2:
 	var viewport_size = get_viewport().get_visible_rect().size
 	var target_position_x: float
 	var target_position_y: float
-	var target_position: Vector2	
+	var target_position: Vector2
 	
 	if message_screen_position == MessageScreenPosition.TOP:
 		target_position_x = message.position.x

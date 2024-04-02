@@ -14,6 +14,7 @@ signal resume_displaying(message: SMSMessage)
 ## Whether the messages intercepts mouse clicks or not
 @export var handle_mouse_clicks: bool
 
+
 @export_group("Start Config")
 
 ## Starting colours of a message
@@ -23,11 +24,15 @@ signal resume_displaying(message: SMSMessage)
 ## this as null.
 @export var start_texture: StyleBox
 
+
 @export_group("Display Config")
+
 ## Config of the message when it is displaying (i.e. not moving into position or off-screen)
 @export var display_config: SMSMessageConfig
 
+
 @export_group("Highlight Config")
+
 ## Highlight colour configuration of a message
 @export var highlight_colour_config: SMSMessageColourConfig
 
@@ -35,44 +40,17 @@ signal resume_displaying(message: SMSMessage)
 ## leave this as null.
 @export var highlight_texture: StyleBox
 
+
 @export_group("Reorder Config")
+
 ## Config for messages when they move out of the way of other messages
 @export var reorder_config: SMSMessageConfig
 
 @export_group("Exit Config")
+
 ## Config for messages when they are moving off-screen after displaying
 @export var exit_config: SMSMessageConfig
 
-
-
-
-## Texture used to highlight the panel when hovered over
-#@export var panel_container_highlight_style_box_texture: StyleBox
-
-## Colour of the message panel container when created
-#@export var start_panel_container_modulation: Color = Color.TRANSPARENT
-
-## Colour of the message text when created
-#@export var start_text_colour: Color = Color.TRANSPARENT
-
-## Colour of image when created
-#@export var start_image_modulation: Color = Color.TRANSPARENT
-
-## Highlight colour of text when hovering over a message with mouse.
-## Only works if handle_mouse_clicks is true
-#@export var text_highlight_colour: Color
-
-## Highlight colour of the panel container when hovering over a message with mouse.
-## Only works if handle_mouse_clicks is true
-#@export var panel_highlight_colour: Color
-
-## Contains parameters for moving a message to a position on screen, where the user can
-## read it. The actual position is set in the sms_message_spawner
-#@export var display_message_config: SMSMessageMoveConfig
-
-## Contains parameters for when a message has finished displaying and moves off-screen
-## (if desired)
-#@export var exit_message_config: SMSMessageMoveConfig
 
 @onready var message_rich_label: RichTextLabel = $MessageMarginContainer/HBoxContainer/RichTextMessageLabel
 @onready var image_texture_rect: TextureRect = $MessageMarginContainer/HBoxContainer/ImageMarginContainer/MessageImage
@@ -81,6 +59,9 @@ signal resume_displaying(message: SMSMessage)
 
 var start_position_config: SMSMessagePositionConfig
 var is_moving: bool = false
+var has_theme: bool = false
+var has_override_theme: bool = false
+var panel_container_using_texture_at_start: bool = false
 
 
 var is_displaying: bool = false
@@ -89,9 +70,6 @@ var handling_mouse_click: bool = false
 var pause_displaying: bool = false
 var text: String
 var is_set_to_delete: bool = false
-var panel_container_using_texture: bool = false
-var has_theme: bool = false
-var has_override_theme: bool = false
 var theme_override_type: ThemeOverrideType = ThemeOverrideType.NO_OVERRIDE
 var original_style_box_override: StyleBox
 
@@ -119,17 +97,9 @@ enum ThemeOverrideType {
 }
 
 func _ready():
-	set_initial_modulations_and_textures()
 	check_themes()
-		
-	display_timer = Timer.new()
-	add_child(display_timer)
-	display_timer.autostart = false
-	
-	display_timer.one_shot = false
-	display_timer.wait_time = display_time
-	display_timer.stop()
-	display_timer.timeout.connect(on_display_message_finished)	
+	set_initial_modulations_and_textures()
+	setup_display_timer()
 	
 	if handle_mouse_clicks == true:
 		mouse_filter = MOUSE_FILTER_STOP
@@ -137,7 +107,7 @@ func _ready():
 		mouse_filter = MOUSE_FILTER_IGNORE
 
 
-func _input(event):		
+func _input(event):
 	if (event is InputEventMouseButton == true && handling_mouse_click == false 
 			&& event.button_index == MOUSE_BUTTON_LEFT && event.pressed == true 
 			&& mouse_inside == true):
@@ -145,18 +115,33 @@ func _input(event):
 			handle_mouse_click()
 
 
-func set_initial_modulations_and_textures():
-	#image_texture_rect.self_modulate = start_image_modulation
-	#self_modulate.a = 1
-	self.visible = false
-	#self["theme_override_styles/panel"] = panel_container_style_box_texture
-	message_rich_label.modulate.a = 0
-
-
+# Changing any properties for a theme will change them for all objects
+# with that theme. So if there is a theme and we want to change properties, we 
+# use theme overrides.
 func check_themes():
 	if theme != null:
+		# If there is a theme, we need to set overrides for various properties so
+		# as to not change the actual theme.
 		print("Has theme")
 		has_theme = true;
+		if theme["PanelContainer/styles/panel"] is StyleBoxTexture:
+			# We only need to worry about stylebox textures. All other styleboxes
+			# don't seem to have a property for a texture.
+			print("It is one")
+			var original_panel_theme: StyleBoxTexture = theme["PanelContainer/styles/panel"]
+		
+		if start_texture != null:
+			# create texture override for the panel
+			#self["theme_override_styles/panel"] = start_texture
+			pass
+		
+		
+		
+		var current_theme = theme["PanelContainer/styles/panel"]
+		print("Theme: ", current_theme["modulate_color"])
+		print("Start Panel Container: ", start_colour_config.panel_container_colour)
+	
+	
 	
 	var theme_override_style = self["theme_override_styles/panel"]
 	
@@ -178,6 +163,51 @@ func check_themes():
 	elif theme_override_style is StyleBoxLine:
 		print("Do this StyleBoxLine")
 		theme_override_type = ThemeOverrideType.STYLEBOX_LINE
+
+
+func set_initial_modulations_and_textures():
+	#image_texture_rect.self_modulate = start_image_modulation
+	#self_modulate.a = 1
+	self.visible = false
+	
+	# Check to see if any themes have been set. If not we need to create one
+	# to get flat colours.
+	if has_theme == false && has_override_theme == false && start_texture == null:
+		var flat_colours_style_box_theme := StyleBoxFlat.new()
+		flat_colours_style_box_theme.bg_color = start_colour_config.panel_container_colour
+		theme_override_type = ThemeOverrideType.STYLEBOX_FLAT
+		self["theme_override_styles/panel"] = flat_colours_style_box_theme
+		
+		self_modulate = start_colour_config.panel_container_colour
+		message_rich_label["theme_override_colors/default_color"] = start_colour_config.text_colour
+		
+		if message_rich_label["theme_override_colors/font_shadow_color"] != null:
+			print("Setting font shadow colour")
+			message_rich_label["theme_override_colors/font_shadow_color"] = start_colour_config.text_shadow_colour
+		
+		if message_rich_label["theme_override_colors/font_outline_color"] != null:
+			print("Setting font outline colour")
+			message_rich_label["theme_override_colors/font_outline_color"] = start_colour_config.text_outline_colour
+		
+		
+		
+		
+		
+		
+		
+	#self["theme_override_styles/panel"] = panel_container_style_box_texture
+	#message_rich_label.modulate.a = 0
+
+
+func setup_display_timer():
+	display_timer = Timer.new()
+	add_child(display_timer)
+	display_timer.autostart = false
+	
+	display_timer.one_shot = false
+	display_timer.wait_time = display_time
+	display_timer.stop()
+	display_timer.timeout.connect(on_display_message_finished)	
 
 
 func get_text():
@@ -260,86 +290,69 @@ func get_message_config_from_enum(sms_message_config_type: SMSMessageConfigType)
 	return sms_message_config
 
 
-func move(to_sms_message_config_type: SMSMessageConfigType,
+func move(target_sms_message_config_type: SMSMessageConfigType,
 		terminate_after: bool):	
 	#if is_moving == true:
 	#	await moving_finished
 	
 	#var from_config: SMSMessageConfig = get_message_config_from_enum(from_sms_message_config_type)
-	var to_config: SMSMessageConfig = get_message_config_from_enum(to_sms_message_config_type)	
+	var target_config: SMSMessageConfig = get_message_config_from_enum(target_sms_message_config_type)	
 	
 	#if from_config == null:
 		#printerr("from_config is null.")
 		#finish_move()
 		#return
 		
-	if to_config == null:
-		printerr("to_config is null.")
+	if target_config == null:
+		printerr("target_config is null.")
 		finish_move()
 		return
 	
-	var changing_colours: bool = to_config.is_changing_colours
+	var changing_colours: bool = target_config.is_changing_colours
 	#var start_position: Vector2 = to_config.move_config.position_config.start_position
-	var target_position: Vector2 = to_config.move_config.position
+	var target_position: Vector2 = target_config.move_config.position
 	
 	self.visible = true
 	is_moving = true
 	
 	# Tween position of message to target position and assign it to current_tween
-	var move_tween: Tween = create_tween()
-	move_tween.set_parallel(true).tween_property(
-		self, 
-		"position",
-		to_config.move_config.position,
-		to_config.move_config.move_duration
-	).set_trans(
-		to_config.move_config.colour_tween_transition_type
-	).set_ease(
-		to_config.move_config.colour_tween_ease_type
-	)
-	#current_move_tween = move_tween
+	var move_tween: Tween = start_move_tween(target_config)
 	
 	if changing_colours == true:
-		var colour_tween_duration = to_config.move_config.colour_change_duration
+		var colour_tween_duration = target_config.move_config.colour_change_duration
 		
 		# Changing the colours of the message should not take longer than the move duration.
 		# If it does, it might cause strange tweening where the desired colours aren't reached
-		clampf(colour_tween_duration, 0, to_config.move_config.move_duration)
+		clampf(colour_tween_duration, 0, target_config.move_config.move_duration)
 		
-		# Create tween for changing the panel colour
-		var panel_colour_tween: Tween = create_tween()
-		panel_colour_tween.set_parallel(true
-		).tween_property(
-			self,
-			"self_modulate",
-			to_config.to_colour_config.panel_container_colour,
-			colour_tween_duration
-		).set_trans(
-			to_config.move_config.colour_tween_transition_type
-		).set_ease(
-			to_config.move_config.colour_tween_ease_type
-		)
-		
-		var text_colour_tween: Tween = create_tween()
-		text_colour_tween.set_parallel(true
-		).tween_property(
-			self.message_rich_label,
-			"theme_override_colors/default_color",
-			to_config.to_colour_config.text_colour,
-			colour_tween_duration
-		).set_trans(
-			to_config.move_config.colour_tween_transition_type
-		).set_ease(
-			to_config.move_config.colour_tween_ease_type
-		)
+		# Create tween for changing colours of the various nodes and properties
+		var panel_colour_tween: Tween = start_panel_colour_change_tween(target_config)
+		var text_colour_tween: Tween = start_text_colour_change_tween(target_config)
+		var text_outline_Tween: Tween = start_text_outline_colour_change_tween(target_config)
 		
 		#Todo: text outline colour, text shadow colour, image modulation, texture?
 		
 		if terminate_after == false:
-			move_tween.tween_callback(finish_move).set_delay(to_config.move_config.move_duration)
+			move_tween.tween_callback(finish_move).set_delay(target_config.move_config.move_duration)
 		else:
-			move_tween.tween_callback(finish_move_and_delete).set_delay(to_config.move_config.move_duration)
+			move_tween.tween_callback(finish_move_and_delete).set_delay(target_config.move_config.move_duration)
 
+
+func start_move_tween(target_config: SMSMessageConfig) -> Tween:
+	var move_tween: Tween = create_tween()
+	
+	move_tween.set_parallel(true).tween_property(
+		self, 
+		"position",
+		target_config.move_config.position,
+		target_config.move_config.move_duration
+	).set_trans(
+		target_config.move_config.colour_tween_transition_type
+	).set_ease(
+		target_config.move_config.colour_tween_ease_type
+	)
+	
+	return move_tween
 
 # Moves this object to the target position in message_config in move_duration seconds
 # using move_tween_transition_type and move_tween_ease_type if use_tween_transition_and_ease
@@ -401,6 +414,52 @@ func move(to_sms_message_config_type: SMSMessageConfigType,
 		#move_tween.tween_callback(finish_move_and_delete).set_delay(message_config.move_duration)
 	#else:
 		#move_tween.tween_callback(finish_move).set_delay(message_config.move_duration)
+
+
+func start_panel_colour_change_tween(target_config: SMSMessageConfig) -> Tween:	
+	var panel_colour_tween: Tween = create_tween()
+	
+	panel_colour_tween.set_parallel(true
+		).tween_property(
+			self,
+			"self_modulate",
+			target_config.target_colour_config.panel_container_colour,
+			target_config.move_config.colour_change_duration
+		).set_trans(
+			target_config.move_config.colour_tween_transition_type
+		).set_ease(
+			target_config.move_config.colour_tween_ease_type
+		)
+	
+	return panel_colour_tween
+
+
+func start_text_colour_change_tween(target_config: SMSMessageConfig) -> Tween:
+	var text_colour_tween: Tween = create_tween()
+	
+	text_colour_tween.set_parallel(true
+		).tween_property(
+			self.message_rich_label,
+			"theme_override_colors/default_color",
+			target_config.target_colour_config.text_colour,
+			target_config.move_config.colour_change_duration
+		).set_trans(
+			target_config.move_config.colour_tween_transition_type
+		).set_ease(
+			target_config.move_config.colour_tween_ease_type
+		)
+	
+	return text_colour_tween
+
+
+func start_text_outline_colour_change_tween(target_config: SMSMessageConfig) -> Tween:
+	var text_outline_colour_tween: Tween = create_tween()
+	return text_outline_colour_tween
+
+
+func start_tween(node_to_tween: Node, property_to_tween: String, duration: float, 
+		transition_type: Tween.TransitionType, ease_type: Tween.EaseType) -> Tween:
+	return create_tween()
 
 
 # moves this object to the target position using exit_message_config and deletes it 
@@ -481,6 +540,9 @@ func _on_mouse_exited():
 	if handle_mouse_clicks == false:
 		return
 	
+	if is_instance_valid(self) == false:
+		return
+	
 	#print("Mouse exited message: ", get_text())
 	mouse_inside = false
 	
@@ -488,7 +550,7 @@ func _on_mouse_exited():
 		#print("Has override theme")
 		self["theme_override_styles/panel"] = original_style_box_override
 	
-	if panel_container_using_texture == false:
+	if panel_container_using_texture_at_start == false:
 		#self.self_modulate = display_message_config.to_panel_container_colour
 		pass
 	

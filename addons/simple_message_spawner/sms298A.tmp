@@ -1,23 +1,33 @@
-[gd_scene load_steps=22 format=3 uid="uid://cb2b3a4e5w2mb"]
+[gd_scene load_steps=26 format=3 uid="uid://cb2b3a4e5w2mb"]
 
+[ext_resource type="Theme" uid="uid://bce8trn6jgasu" path="res://addons/simple_message_spawner/resources/sms_message_theme.tres" id="1_x3q71"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/sms_message.gd" id="2_vnlh0"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_colour_config.gd" id="3_f7vwm"]
 [ext_resource type="Texture2D" uid="uid://o331m2u5d005" path="res://addons/simple_message_spawner/demo_ resources/images/godotIconWink128x128.png" id="4_nkwy2"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_move_config.gd" id="5_lychw"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_config.gd" id="6_i74nk"]
+[ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_texture_config.gd" id="7_mjiuy"]
+
+[sub_resource type="StyleBoxTexture" id="StyleBoxTexture_jhl5g"]
 
 [sub_resource type="Resource" id="Resource_jyrpa"]
 script = ExtResource("3_f7vwm")
 panel_container_colour = Color(0, 0, 1, 1)
-text_colour = Color(0, 0, 0, 1)
+text_colour = Color(1, 1, 1, 1)
 text_outline_colour = Color(1, 0.270588, 0, 1)
 text_shadow_colour = Color(0.545098, 0, 0, 1)
 image_modulation = Color(1, 1, 1, 1)
 
+[sub_resource type="Resource" id="Resource_vxbjs"]
+script = ExtResource("7_mjiuy")
+use_shader = true
+target_texture_modulation = Color(1, 1, 1, 1)
+change_time = 0.0
+
 [sub_resource type="Resource" id="Resource_uvkx6"]
 script = ExtResource("5_lychw")
-move_duration = 4.0
-colour_change_duration = 4.0
+move_duration = 0.4
+colour_change_duration = 0.4
 move_tween_transition_type = 7
 move_tween_ease_type = 2
 colour_tween_transition_type = 0
@@ -141,10 +151,13 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 90.0
 grow_horizontal = 2
+theme = ExtResource("1_x3q71")
+theme_override_styles/panel = SubResource("StyleBoxTexture_jhl5g")
 script = ExtResource("2_vnlh0")
 display_time = 1.4
 handle_mouse_clicks = true
 start_colour_config = SubResource("Resource_jyrpa")
+start_texture = SubResource("Resource_vxbjs")
 display_config = SubResource("Resource_j7jjp")
 reorder_config = SubResource("Resource_2mm4l")
 exit_config = SubResource("Resource_bkpxo")
@@ -176,16 +189,24 @@ texture = SubResource("AtlasTexture_v8hbb")
 expand_mode = 1
 stretch_mode = 5
 
+[node name="MessageLabel" type="Label" parent="MessageMarginContainer/HBoxContainer"]
+visible = false
+custom_minimum_size = Vector2(1, 0)
+layout_mode = 2
+size_flags_horizontal = 3
+size_flags_vertical = 1
+mouse_filter = 1
+theme_override_colors/font_color = Color(0, 0, 0, 1)
+theme_override_font_sizes/font_size = 24
+text = "This is an annoying message!"
+vertical_alignment = 1
+autowrap_mode = 2
+
 [node name="RichTextMessageLabel" type="RichTextLabel" parent="MessageMarginContainer/HBoxContainer"]
 layout_mode = 2
 size_flags_horizontal = 3
 mouse_filter = 1
 theme_override_colors/default_color = Color(0, 0, 0, 1)
-theme_override_colors/font_shadow_color = Color(0, 0, 0, 1)
-theme_override_colors/font_outline_color = Color(0, 0, 0, 1)
-theme_override_constants/shadow_offset_x = 325
-theme_override_constants/shadow_outline_size = 5
-theme_override_constants/outline_size = 30
 theme_override_fonts/normal_font = SubResource("FontFile_dvrij")
 bbcode_enabled = true
 text = "fafdssfdafdsfsdfsdasdjfkhjskdahjklhsadlkh gfdgdfsgdf

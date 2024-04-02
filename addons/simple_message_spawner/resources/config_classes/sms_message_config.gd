@@ -9,8 +9,10 @@ class_name SMSMessageConfig
 @export var is_changing_colours: bool = false
 
 ## Target colours of the message and the text
-@export var to_colour_config: SMSMessageColourConfig
+@export var target_colour_config: SMSMessageColourConfig
 
-## Target texture of the message. If you're just using the panel colours and text, leave this 
-## as null.
-@export var to_texture: StyleBox = null
+## Target texture confguration of the message's panel container
+@export var target_panel_container_texture_config: SMSMessageTextureConfig
+
+## Target texture confguration of message's image
+@export var target_image_texture_config: SMSMessageTextureConfig
