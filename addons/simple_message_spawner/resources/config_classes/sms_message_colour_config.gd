@@ -1,16 +1,29 @@
 extends Resource
 class_name SMSMessageColourConfig
 
-## Colour that the panel container changes to
+## If true, panel_container_colour overrides the theme overrides
+@export var use_panel_container_colour: bool = true 
+
+## Colour that the panel container changes to. Overrides any existing themes / theme overrides
 @export var panel_container_colour: Color = Color.BLACK
 
-## Colour that the text changes to
+## If true, text_colour overrides the theme overrides
+@export var use_text_colour: bool = true 
+
+## Colour that the text changes to. Overrides any existing themes / theme overrides if 
+## use_text_colour is true.
 @export var text_colour: Color = Color.WHITE
 
-## Colour that the text outline changes to if it is available
+## If true, text_outline_colour overrides the theme overrides 
+@export var use_text_outline_colour: bool = false
+
+## Colour that the text outline changes to if it is available. Overrides any existing themes / theme overrides
 @export var text_outline_colour: Color = Color.ORANGE_RED
 
-## Colour that the text shadow color changes to if it is available
+## If true, text_shadow_colour overrides the theme overrides 
+@export var use_text_shadow_colour: bool = false
+
+## Colour that the text shadow color changes to if it is available. Overrides any existing themes / theme overrides
 @export var text_shadow_colour: Color = Color.DARK_RED
 
 ## Modulation of the image if there is one

@@ -5,5 +5,4 @@
 [node name="MessageSpawner" type="CanvasLayer"]
 script = ExtResource("1_r6nhn")
 message_screen_position = 1
-message_source_direction = 4
-message_exit_direction = 4
+message_source_direction = 0

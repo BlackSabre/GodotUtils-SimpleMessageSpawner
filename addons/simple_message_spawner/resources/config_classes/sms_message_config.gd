@@ -5,7 +5,7 @@ class_name SMSMessageConfig
 @export var move_config: SMSMessageMoveConfig
 
 ## Whether the colour config should be used or not. If you don't want the message to change 
-## colours when moving, deselect this.
+## colours at all when moving, deselect this.
 @export var is_changing_colours: bool = false
 
 ## Target colours of the message and the text

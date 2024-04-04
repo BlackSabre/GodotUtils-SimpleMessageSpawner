@@ -20,9 +20,9 @@ signal resume_displaying(message: SMSMessage)
 ## Starting colours of a message
 @export var start_colour_config: SMSMessageColourConfig
 
-## Starting stylebox texture of a message. If you're just using the panel colours and text, leave 
-## this as null.
-@export var start_texture: StyleBox
+## Starting stylebox texture for the panel container of a message. If you're just using the 
+## panel colours and text, leave this as null.
+@export var start_panel_container_texture: StyleBox
 
 
 @export_group("Display Config")
@@ -127,21 +127,16 @@ func check_themes():
 		if theme["PanelContainer/styles/panel"] is StyleBoxTexture:
 			# We only need to worry about stylebox textures. All other styleboxes
 			# don't seem to have a property for a texture.
-			print("It is one")
+			print("It is a StyleBoxTexture")
 			var original_panel_theme: StyleBoxTexture = theme["PanelContainer/styles/panel"]
-		
-		if start_texture != null:
-			# create texture override for the panel
-			#self["theme_override_styles/panel"] = start_texture
-			pass
-		
-		
 		
 		var current_theme = theme["PanelContainer/styles/panel"]
 		print("Theme: ", current_theme["modulate_color"])
 		print("Start Panel Container: ", start_colour_config.panel_container_colour)
 	
-	
+	if start_panel_container_texture != null:
+		# create texture override for the panel
+		self["theme_override_styles/panel"] = start_panel_container_texture
 	
 	var theme_override_style = self["theme_override_styles/panel"]
 	
@@ -170,24 +165,27 @@ func set_initial_modulations_and_textures():
 	#self_modulate.a = 1
 	self.visible = false
 	
-	# Check to see if any themes have been set. If not we need to create one
-	# to get flat colours.
-	if has_theme == false && has_override_theme == false && start_texture == null:
+	# If there is no texture in start_panel_container_texture, we create a flat
+	# texture so the colours can change 
+	if start_panel_container_texture == null:
 		var flat_colours_style_box_theme := StyleBoxFlat.new()
-		flat_colours_style_box_theme.bg_color = start_colour_config.panel_container_colour
+		flat_colours_style_box_theme.bg_color = Color.WHITE
 		theme_override_type = ThemeOverrideType.STYLEBOX_FLAT
 		self["theme_override_styles/panel"] = flat_colours_style_box_theme
-		
-		self_modulate = start_colour_config.panel_container_colour
-		message_rich_label["theme_override_colors/default_color"] = start_colour_config.text_colour
-		
-		if message_rich_label["theme_override_colors/font_shadow_color"] != null:
-			print("Setting font shadow colour")
-			message_rich_label["theme_override_colors/font_shadow_color"] = start_colour_config.text_shadow_colour
-		
-		if message_rich_label["theme_override_colors/font_outline_color"] != null:
-			print("Setting font outline colour")
-			message_rich_label["theme_override_colors/font_outline_color"] = start_colour_config.text_outline_colour
+	
+	# Set start colours of the relevant nodes
+	self_modulate = start_colour_config.panel_container_colour
+	
+	if start_colour_config.use_text_colour == true:
+		message_rich_label.set("theme_override_colors/default_color", start_colour_config.text_colour)
+	
+	if start_colour_config.use_text_shadow_colour == true:
+		print("Setting font shadow colour")
+		message_rich_label.set("theme_override_colors/font_shadow_color", start_colour_config.text_shadow_colour)
+	
+	if message_rich_label["theme_override_colors/font_outline_color"] != null:
+		print("Setting font outline colour")
+		message_rich_label["theme_override_colors/font_outline_color"] = start_colour_config.text_outline_colour
 		
 		
 		
@@ -275,7 +273,7 @@ func get_message_config_from_enum(sms_message_config_type: SMSMessageConfigType)
 	match(sms_message_config_type):
 		SMSMessageConfigType.START:
 			sms_message_config.to_colour_config = start_colour_config
-			sms_message_config.to_texture = start_texture
+			sms_message_config.to_texture = start_panel_container_texture
 			sms_message_config.move_config.position_config = start_position_config
 		SMSMessageConfigType.DISPLAY:
 			return display_config
@@ -292,24 +290,14 @@ func get_message_config_from_enum(sms_message_config_type: SMSMessageConfigType)
 
 func move(target_sms_message_config_type: SMSMessageConfigType,
 		terminate_after: bool):	
-	#if is_moving == true:
-	#	await moving_finished
-	
-	#var from_config: SMSMessageConfig = get_message_config_from_enum(from_sms_message_config_type)
 	var target_config: SMSMessageConfig = get_message_config_from_enum(target_sms_message_config_type)	
-	
-	#if from_config == null:
-		#printerr("from_config is null.")
-		#finish_move()
-		#return
 		
 	if target_config == null:
 		printerr("target_config is null.")
 		finish_move()
 		return
 	
-	var changing_colours: bool = target_config.is_changing_colours
-	#var start_position: Vector2 = to_config.move_config.position_config.start_position
+	var changing_colours: bool = target_config.is_changing_colours	
 	var target_position: Vector2 = target_config.move_config.position
 	
 	self.visible = true
@@ -318,33 +306,38 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 	# Tween position of message to target position and assign it to current_tween
 	var move_tween: Tween = start_move_tween(target_config)
 	
+	# Create tween for changing colours of the various nodes and properties
 	if changing_colours == true:
-		# Create tween for changing colours of the various nodes and properties
-		var panel_colour_tween: Tween = start_colour_change_tween(self, "self_modulate", 
-				target_config.target_colour_config.panel_container_colour, 
+		var panel_colour_tween: Tween
+		var text_colour_tween: Tween
+		var text_outline_colour_tween: Tween
+		var text_shadow_colour_tween: Tween
+		
+		print("  curr: ", self_modulate)
+		if target_config.target_colour_config.use_panel_container_colour == true:
+			panel_colour_tween = start_colour_change_tween(self, "self_modulate", 
+				target_config.target_colour_config.panel_container_colour,
 				target_config)
-		var text_colour_tween: Tween = start_colour_change_tween(message_rich_label, 
+		
+		if target_config.target_colour_config.use_text_colour == true:
+			text_colour_tween = start_colour_change_tween(message_rich_label, 
 				"theme_override_colors/default_color", 
 				target_config.target_colour_config.text_colour, target_config)
-		var text_outline_colour_tween: Tween = start_colour_change_tween(message_rich_label, 
+		
+		if target_config.target_colour_config.use_text_outline_colour == true:
+			text_outline_colour_tween = start_colour_change_tween(message_rich_label, 
 				"theme_override_colors/font_outline_color", 
 				target_config.target_colour_config.text_outline_colour, target_config)
-		var text_shadow_colour_tween: Tween = start_colour_change_tween(message_rich_label, 
+		
+		if target_config.target_colour_config.use_text_shadow_colour == true:
+			text_shadow_colour_tween = start_colour_change_tween(message_rich_label, 
 				"theme_override_colors/font_shadow_color", 
 				target_config.target_colour_config.text_shadow_colour, target_config)
-		
-		
-		#var panel_colour_tween: Tween = start_panel_colour_change_tween(target_config)
-		#var text_colour_tween: Tween = start_text_colour_change_tween(target_config)
-		#var text_outline_colour_tween: Tween = start_text_outline_colour_change_tween(target_config)
-		#var text_shadow_colour_tween: Tween = start_text_shadow_colour_change_tween(target_config)
-		
-		#Todo: text outline colour, text shadow colour, image modulation, texture?
-		
-		if terminate_after == false:
-			move_tween.tween_callback(finish_move).set_delay(target_config.move_config.move_duration)
-		else:
-			move_tween.tween_callback(finish_move_and_delete).set_delay(target_config.move_config.move_duration)
+	
+	if terminate_after == false:
+		move_tween.tween_callback(finish_move).set_delay(target_config.move_config.move_duration)
+	else:
+		move_tween.tween_callback(finish_move_and_delete).set_delay(target_config.move_config.move_duration)
 
 
 func start_move_tween(target_config: SMSMessageConfig) -> Tween:
@@ -365,8 +358,7 @@ func start_move_tween(target_config: SMSMessageConfig) -> Tween:
 
 
 func start_colour_change_tween(control_node: Control, property: String, 
-		target_colour: Color, target_config: SMSMessageConfig) -> Tween:
-	
+		target_colour: Color, target_config: SMSMessageConfig) -> Tween:	
 	var colour_change_tween: Tween = create_tween()
 	var colour_tween_duration = target_config.target_colour_config.colour_change_duration
 	
@@ -376,7 +368,13 @@ func start_colour_change_tween(control_node: Control, property: String,
 	
 	if (control_node[property] == null):
 		print("Adding property '", property, "' to control node ", control_node.name)
-		control_node.set(property, Color.BLACK)
+		control_node.set(property, Color.WHITE)
+	
+	print("    control_node name: ", control_node.name)
+	print("    property: ", property)
+	print("    target_colour: ", target_colour)
+	print("    property_value: ", control_node[property])
+	print("    ")
 	
 	colour_change_tween.set_parallel(true
 		).tween_property(
@@ -391,78 +389,6 @@ func start_colour_change_tween(control_node: Control, property: String,
 		)
 	
 	return colour_change_tween
-
-#
-#func start_panel_colour_change_tween(target_config: SMSMessageConfig) -> Tween:	
-	#var panel_colour_tween: Tween = create_tween()
-	#
-	#panel_colour_tween.set_parallel(true
-		#).tween_property(
-			#self,
-			#"self_modulate",
-			#target_config.target_colour_config.panel_container_colour,
-			#target_config.move_config.colour_change_duration
-		#).set_trans(
-			#target_config.move_config.colour_tween_transition_type
-		#).set_ease(
-			#target_config.move_config.colour_tween_ease_type
-		#)
-	#
-	#return panel_colour_tween
-#
-#
-#func start_text_colour_change_tween(target_config: SMSMessageConfig) -> Tween:
-	#var text_colour_tween: Tween = create_tween()
-	#
-	#text_colour_tween.set_parallel(true
-		#).tween_property(
-			#self.message_rich_label,
-			#"theme_override_colors/default_color",
-			#target_config.target_colour_config.text_colour,
-			#target_config.move_config.colour_change_duration
-		#).set_trans(
-			#target_config.move_config.colour_tween_transition_type
-		#).set_ease(
-			#target_config.move_config.colour_tween_ease_type
-		#)
-	#
-	#return text_colour_tween
-#
-#
-#func start_text_outline_colour_change_tween(target_config: SMSMessageConfig) -> Tween:
-	#var text_outline_colour_tween: Tween = create_tween()
-	#
-	#text_outline_colour_tween.set_parallel(true
-		#).tween_property(
-			#self.message_rich_label,
-			#"theme_override_colors/font_outline_color",
-			#target_config.target_colour_config.text_outline_colour,
-			#target_config.move_config.colour_change_duration
-		#).set_trans(
-			#target_config.move_config.colour_tween_transition_type
-		#).set_ease(
-			#target_config.move_config.colour_tween_ease_type
-		#)
-	#
-	#return text_outline_colour_tween
-#
-#
-#func start_text_shadow_colour_change_tween(target_config: SMSMessageConfig) -> Tween:
-	#var text_shadow_colour_tween: Tween = create_tween()
-	#
-	#text_shadow_colour_tween.set_parallel(true
-		#).tween_property(
-			#self.message_rich_label,
-			#"theme_override_colors/font_shadow_color",
-			#target_config.target_colour_config.text_shadow_colour,
-			#target_config.move_config.colour_change_duration
-		#).set_trans(
-			#target_config.move_config.colour_tween_transition_type
-		#).set_ease(
-			#target_config.move_config.colour_tween_ease_type
-		#)
-	#
-	#return text_shadow_colour_tween
 
 
 # moves this object to the target position using exit_message_config and deletes it 
