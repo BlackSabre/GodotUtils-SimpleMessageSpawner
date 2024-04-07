@@ -1,0 +1,9 @@
+[gd_resource type="ShaderMaterial" load_steps=3 format=3 uid="uid://eg28lx8n7mlp"]
+
+[ext_resource type="Shader" path="res://addons/simple_message_spawner/demo_ resources/shaders/sms_message_texture_fade_out_fade_in.gdshader" id="1_antsq"]
+[ext_resource type="Texture2D" uid="uid://c8al55wsgjp08" path="res://addons/simple_message_spawner/demo_ resources/images/panel.png" id="2_mlny6"]
+
+[resource]
+shader = ExtResource("1_antsq")
+shader_parameter/weight = 0.497
+shader_parameter/target_texture = ExtResource("2_mlny6")

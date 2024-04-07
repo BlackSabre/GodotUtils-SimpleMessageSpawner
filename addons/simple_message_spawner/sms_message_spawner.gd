@@ -135,25 +135,26 @@ func process_messages():
 
 # Instantiates a new message using the first object in message_text_queue, adds it to the tree,
 # sets the anhchors, and sets the initial position.
-func add_and_configure_message_object() -> SMSMessage:
-	await get_tree().process_frame
-	
+func add_and_configure_message_object() -> SMSMessage:	
 	if messages_on_screen.size() > max_messages_on_screen:
 		return
 	
+	await get_tree().process_frame
 	var message_text: String = message_text_queue.pop_front()
 	var message: SMSMessage = message_scene.instantiate()
+	
 	add_child(message)
-	
-	message.finished_displaying.connect(on_message_finished_displaying.bind(message))	
 	message.set_label_text(message_text)
-	
 	set_anchors(message, message_screen_position)
+		
+	message.adjust_size()
+	message.finished_displaying.connect(on_message_finished_displaying.bind(message))		
 	
 	if message_screen_position == MessageScreenPosition.TOP:
-		message.position.y = -message.size.y
+		message.position.y = -message.get_height()
 	elif message_screen_position == MessageScreenPosition.BOTTOM:
-		message.position.y = get_viewport().size.y + message.size.y
+		message.position.y = get_viewport().size.y + message.get_height()
+	
 	
 	# Need to wait until next frame so the message size & positions properties are updated
 	await get_tree().process_frame
@@ -170,9 +171,11 @@ func add_and_configure_message_object() -> SMSMessage:
 func move_message_initial(message: SMSMessage):	
 	if is_doing_message_initial_move == true:
 		return
-		
+	
+	
 	is_doing_message_initial_move = true
 	message.z_index = -1
+	
 	var start_position: Vector2 = get_message_start_position(message)
 	var target_position: Vector2 = get_message_target_position(message)
 	
@@ -251,40 +254,44 @@ func reorder_messages_at_top_of_screen(message: SMSMessage, ignore_first_message
 		# leaves space for message to move in 
 		y_position = message.size.y
 	
+	# Calculate the new y-positions of each message and move them there
 	while current_message_index >= 0:
 		var current_message = messages_on_screen[current_message_index]
 		var target_position := Vector2(current_message.position.x, y_position)
-		current_message.set_display_config_target_position(target_position)
-		#current_message.move(current_message.position)
+		current_message.set_display_config_target_position(target_position)		
 		current_message.move(SMSMessage.SMSMessageConfigType.DISPLAY, false)
 		y_position += current_message.size.y
 		current_message_index -= 1
 	
+	# Wait for each message to finish moving to avoid possible overlapping
 	for current_message in messages_on_screen:
 		if current_message.is_moving:
 			await current_message.moving_finished
 
 
 # Reorders messages at the bottom of the screen so that they stack
-func reorder_messages_at_bottom_of_screen(message: SMSMessage, ignore_first_message: bool = false):
-	var move_amount_y: float = message.size.y
+func reorder_messages_at_bottom_of_screen(message: SMSMessage, ignore_first_message: bool = false):	
+	await get_tree().process_frame
+	var move_amount_y: float = message.get_height()	
 	var viewport_size_y: float = get_viewport().get_visible_rect().size.y	
 	var current_message_index = messages_on_screen.size() - 1
-	var y_position: float = viewport_size_y - move_amount_y
+	var target_y_position: float = viewport_size_y
 	
 	if ignore_first_message == true:
-		# leaves space for message to move in 
-		y_position -= move_amount_y
+		# leaves space for message to move in
+		target_y_position -= move_amount_y
 	
+	# Calculate the new y-positions of each message and move them there
 	while current_message_index >= 0:
 		var current_message = messages_on_screen[current_message_index]
-		var target_position := Vector2(current_message.position.x, y_position)
-		current_message.set_display_config_target_position(target_position)
-		#current_message.move(current_message.position)
+		target_y_position -= current_message.get_height()
+		var target_position := Vector2(current_message.position.x, target_y_position)
+		current_message.set_display_config_target_position(target_position)				
 		current_message.move(SMSMessage.SMSMessageConfigType.DISPLAY, false)
-		y_position -= current_message.size.y
+		
 		current_message_index -= 1
 	
+	# Wait for each message to finish moving to avoid possible overlapping
 	for current_message in messages_on_screen:
 		if current_message.is_moving:
 			await current_message.moving_finished

@@ -1,0 +1,7 @@
+[gd_resource type="AtlasTexture" load_steps=2 format=3 uid="uid://bpy8y1jl16asa"]
+
+[ext_resource type="Texture2D" uid="uid://o331m2u5d005" path="res://addons/simple_message_spawner/demo_ resources/images/godotIconWink128x128.png" id="1_qxwe6"]
+
+[resource]
+atlas = ExtResource("1_qxwe6")
+region = Rect2(0, 0, 128, 128)
