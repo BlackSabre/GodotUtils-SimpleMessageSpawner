@@ -5,5 +5,5 @@
 
 [resource]
 shader = ExtResource("1_antsq")
-shader_parameter/weight = 0.497
+shader_parameter/weight = 1.0
 shader_parameter/target_texture = ExtResource("2_mlny6")

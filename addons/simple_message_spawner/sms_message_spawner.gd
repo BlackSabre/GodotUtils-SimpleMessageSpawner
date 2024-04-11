@@ -258,8 +258,9 @@ func reorder_messages_at_top_of_screen(message: SMSMessage, ignore_first_message
 	while current_message_index >= 0:
 		var current_message = messages_on_screen[current_message_index]
 		var target_position := Vector2(current_message.position.x, y_position)
-		current_message.set_display_config_target_position(target_position)		
-		current_message.move(SMSMessage.SMSMessageConfigType.DISPLAY, false)
+		#current_message.set_display_config_target_position(target_position)
+		current_message.set_config_target_position(SMSMessage.SMSMessageConfigType.REORDER, target_position)
+		current_message.move(SMSMessage.SMSMessageConfigType.REORDER, false)
 		y_position += current_message.size.y
 		current_message_index -= 1
 	
@@ -286,8 +287,8 @@ func reorder_messages_at_bottom_of_screen(message: SMSMessage, ignore_first_mess
 		var current_message = messages_on_screen[current_message_index]
 		target_y_position -= current_message.get_height()
 		var target_position := Vector2(current_message.position.x, target_y_position)
-		current_message.set_display_config_target_position(target_position)				
-		current_message.move(SMSMessage.SMSMessageConfigType.DISPLAY, false)
+		current_message.set_config_target_position(SMSMessage.SMSMessageConfigType.REORDER, target_position)
+		current_message.move(SMSMessage.SMSMessageConfigType.REORDER, false)
 		
 		current_message_index -= 1
 	

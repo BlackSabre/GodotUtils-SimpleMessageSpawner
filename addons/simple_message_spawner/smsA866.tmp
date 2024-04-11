@@ -13,9 +13,9 @@
 
 [sub_resource type="Resource" id="Resource_jyrpa"]
 script = ExtResource("3_f7vwm")
-use_panel_container_colour = true
+use_panel_container_colour = false
 panel_container_colour = Color(0, 0, 0, 1)
-use_text_colour = false
+use_text_colour = true
 text_colour = Color(0, 0, 0, 1)
 use_text_outline_colour = false
 text_outline_colour = Color(1, 0.270588, 0, 1)
@@ -28,22 +28,22 @@ colour_tween_ease_type = 2
 
 [sub_resource type="Resource" id="Resource_uvkx6"]
 script = ExtResource("5_lychw")
-move_duration = 2.0
+move_duration = 0.6
 move_tween_transition_type = 7
 move_tween_ease_type = 2
 
 [sub_resource type="Resource" id="Resource_okp1o"]
 script = ExtResource("3_f7vwm")
-use_panel_container_colour = true
-panel_container_colour = Color(0.996078, 0.423529, 1, 1)
-use_text_colour = false
+use_panel_container_colour = false
+panel_container_colour = Color(0.627451, 0, 0.639216, 1)
+use_text_colour = true
 text_colour = Color(1, 1, 1, 1)
-use_text_outline_colour = false
+use_text_outline_colour = true
 text_outline_colour = Color(0, 0.866667, 0.396078, 1)
-use_text_shadow_colour = false
+use_text_shadow_colour = true
 text_shadow_colour = Color(0.917647, 0.741176, 0, 1)
 image_modulation = Color(1, 1, 1, 1)
-colour_change_duration = 2.0
+colour_change_duration = 0.6
 colour_tween_transition_type = 0
 colour_tween_ease_type = 2
 
@@ -68,7 +68,7 @@ script = ExtResource("5_f8wcg")
 target_texture = SubResource("StyleBoxTexture_3p1cb")
 use_shader = true
 texture_shader_material = ExtResource("1_p35mi")
-target_texture_modulation = Color(1, 0.231373, 1, 1)
+target_texture_modulation = Color(1, 1, 1, 1)
 change_time = 4.0
 
 [sub_resource type="Resource" id="Resource_j7jjp"]
@@ -80,22 +80,22 @@ target_image_texture_config = SubResource("Resource_nrrtp")
 
 [sub_resource type="Resource" id="Resource_y26w5"]
 script = ExtResource("5_lychw")
-move_duration = 0.4
+move_duration = 0.0
 move_tween_transition_type = 7
 move_tween_ease_type = 2
 
 [sub_resource type="Resource" id="Resource_n0618"]
 script = ExtResource("3_f7vwm")
-use_panel_container_colour = false
+use_panel_container_colour = true
 panel_container_colour = Color(0, 0, 0, 1)
-use_text_colour = false
-text_colour = Color(0.784314, 0, 0.796078, 1)
+use_text_colour = true
+text_colour = Color(1, 1, 1, 1)
 use_text_outline_colour = false
 text_outline_colour = Color(1, 0.270588, 0, 1)
 use_text_shadow_colour = false
 text_shadow_colour = Color(0.545098, 0, 0, 1)
 image_modulation = Color(1, 1, 1, 1)
-colour_change_duration = 0.4
+colour_change_duration = 0.0
 colour_tween_transition_type = 0
 colour_tween_ease_type = 2
 
@@ -112,9 +112,9 @@ move_tween_ease_type = 2
 
 [sub_resource type="Resource" id="Resource_ltffq"]
 script = ExtResource("3_f7vwm")
-use_panel_container_colour = false
+use_panel_container_colour = true
 panel_container_colour = Color(0, 0, 0, 1)
-use_text_colour = false
+use_text_colour = true
 text_colour = Color(1, 1, 1, 1)
 use_text_outline_colour = false
 text_outline_colour = Color(1, 0.270588, 0, 1)
@@ -183,8 +183,10 @@ anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 90.0
 grow_horizontal = 2
+theme_override_styles/panel = ExtResource("3_rkkwc")
 script = ExtResource("2_vnlh0")
 display_time = 3.0
+handle_mouse_clicks = true
 start_colour_config = SubResource("Resource_jyrpa")
 start_panel_container_texture = ExtResource("3_rkkwc")
 display_config = SubResource("Resource_j7jjp")
