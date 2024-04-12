@@ -1,4 +1,4 @@
-[gd_scene load_steps=29 format=3 uid="uid://cb2b3a4e5w2mb"]
+[gd_scene load_steps=31 format=3 uid="uid://cb2b3a4e5w2mb"]
 
 [ext_resource type="Material" uid="uid://eg28lx8n7mlp" path="res://addons/simple_message_spawner/demo_ resources/materials/dark_blue_material.tres" id="1_p35mi"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/sms_message.gd" id="2_vnlh0"]
@@ -10,6 +10,7 @@
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_config.gd" id="6_i74nk"]
 [ext_resource type="Texture2D" uid="uid://bpy8y1jl16asa" path="res://addons/simple_message_spawner/demo_ resources/images/godot_wink_texture.tres" id="7_hvqrn"]
 [ext_resource type="StyleBox" uid="uid://p8y8v78vwdbl" path="res://addons/simple_message_spawner/demo_ resources/stylebox_textures/dark_blue_stylebox_texture.tres" id="7_ouwjk"]
+[ext_resource type="Shader" path="res://addons/simple_message_spawner/demo_ resources/shaders/sms_message_texture_fade_out_fade_in.gdshader" id="9_v1a4m"]
 
 [sub_resource type="Resource" id="Resource_jyrpa"]
 script = ExtResource("3_f7vwm")
@@ -47,10 +48,15 @@ colour_change_duration = 2.0
 colour_tween_transition_type = 0
 colour_tween_ease_type = 2
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_gphj8"]
+shader = ExtResource("9_v1a4m")
+shader_parameter/weight = null
+
 [sub_resource type="Resource" id="Resource_nrrtp"]
 script = ExtResource("5_f8wcg")
 target_texture = ExtResource("7_ouwjk")
-use_shader = false
+use_shader = true
+texture_shader_material = SubResource("ShaderMaterial_gphj8")
 target_texture_modulation = Color(1, 1, 1, 1)
 change_time = 0.0
 
@@ -179,10 +185,12 @@ _data = {
 }
 
 [node name="SMSMessage" type="PanelContainer"]
+material = ExtResource("1_p35mi")
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 90.0
 grow_horizontal = 2
+theme_override_styles/panel = ExtResource("3_rkkwc")
 script = ExtResource("2_vnlh0")
 display_time = 3.0
 start_colour_config = SubResource("Resource_jyrpa")

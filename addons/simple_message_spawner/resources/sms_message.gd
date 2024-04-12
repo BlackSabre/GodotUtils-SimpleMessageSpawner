@@ -329,8 +329,8 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 	# Tween position of message to target position and assign it to current_tween
 	var move_tween: Tween = start_move_tween(target_config)
 	
-	var target_colour_config = target_config.target_colour_config
-	var target_panel_container_texture_config = target_config.target_panel_container_texture_config
+	var target_colour_config: SMSMessageColourConfig = target_config.target_colour_config
+	var target_panel_container_texture_config: SMSMessageTextureConfig = target_config.target_panel_container_texture_config
 	
 	# Create tween for changing colours of the various nodes and properties
 	var panel_colour_tween: Tween
@@ -397,20 +397,16 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 			var shader_duration = clampf(target_panel_container_texture_config.change_time, 
 									0,
 									display_config.move_config.move_duration)
-			var panel_container_material: ShaderMaterial = target_panel_container_texture_config.texture_shader_material
-			if panel_container_material != null:
-				material = panel_container_material.duplicate()				
-				var target_colour: Color = target_panel_container_texture_config.target_texture_modulation
-				var target_stylebox_texture: StyleBoxTexture = target_panel_container_texture_config.target_texture
-				
-				#material.set_shader_parameter("target_texture", target_panel_container_texture_config.target_texture.texture)
-				print("type = ", typeof(target_stylebox_texture.texture))
-				material.set_shader_parameter("target_texture", target_stylebox_texture.texture)
-				var panel_container_texture_tween: Tween = create_tween()
-				
-				panel_container_texture_tween.tween_method(set_fade_shader_value.bind(material), 0.0, 1.0, shader_duration)
-				panel_container_texture_tween.tween_callback(after_shader)
-				
+			var panel_container_shader_material: ShaderMaterial = target_panel_container_texture_config.texture_shader_material
+			
+			if panel_container_shader_material != null:
+				# duplicate the material so not all messages are changed at the same time
+				panel_container_shader_material = panel_container_shader_material.duplicate()
+				material = panel_container_shader_material
+				var panel_container_shader_tween = start_panel_container_shader(
+					panel_container_shader_material,
+					target_panel_container_texture_config,
+					shader_duration)
 	
 	if terminate_after == false:
 		move_tween.tween_callback(finish_move).set_delay(target_config.move_config.move_duration)
@@ -418,14 +414,30 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 		move_tween.tween_callback(finish_move_and_delete).set_delay(target_config.move_config.move_duration)
 
 
-func after_shader():
-	material = null
+func start_panel_container_shader(shader_material: ShaderMaterial, 
+		texture_config: SMSMessageTextureConfig, 
+		shader_duration: float) -> Tween:
+	var target_colour: Color = texture_config.target_texture_modulation
+	var target_stylebox_texture: StyleBoxTexture = texture_config.target_texture
+	
+	shader_material.set_shader_parameter("target_texture", target_stylebox_texture.texture)
+	var panel_container_texture_tween: Tween = create_tween()
+	
+	panel_container_texture_tween.tween_method(set_fade_shader_value.bind(shader_material), 0.0, 1.0, shader_duration)
+	panel_container_texture_tween.tween_callback(finish_panel_container_shader)
+	return panel_container_texture_tween
 	self_modulate = Color.PURPLE
 
+
+func finish_panel_container_shader():
+	material = null
+
+
 func set_fade_shader_value(value: float, shader_material: ShaderMaterial):
-	#print("Value: ", value)
+	print("Value: ", value)
 	shader_material.set_shader_parameter("weight", value)
 	pass
+
 
 func start_move_tween(target_config: SMSMessageConfig) -> Tween:
 	var move_tween: Tween = create_tween()
