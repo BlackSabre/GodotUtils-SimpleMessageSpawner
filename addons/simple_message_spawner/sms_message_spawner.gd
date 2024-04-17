@@ -3,16 +3,33 @@ class_name SMSMessageSpawner
 
 signal new_message_added_for_processing
 
+# Part of screen where the popups display. Didn't bother with left and right 
+# as it doesn't seem like normal behaviour for a message message of this 
+# kind
+enum MessageScreenPosition {
+	TOP,
+	BOTTOM,
+}
+
+# The direction messages move to/from the screen
+enum MessageMoveDirection {
+	NONE,
+	TOP,
+	BOTTOM,
+	LEFT,
+	RIGHT,
+}
+
 ## Part of screen where message displays
-@export var message_screen_position: MessageScreenPosition = MessageScreenPosition.TOP
+@export var message_screen_position: MessageScreenPosition
 
 ## Direction off-screen from where the message comes from
 ## i.e. message looking like it comes from the top
-@export var message_source_direction: MessageMoveDirection = MessageMoveDirection.TOP
+@export var message_source_direction: MessageMoveDirection
 
 ## Direction off-screen where the message disappears to
 ## i.e message moves off-screen to the right after displaying
-@export var message_exit_direction: MessageMoveDirection = MessageMoveDirection.NONE
+@export var message_exit_direction: MessageMoveDirection
 
 ## Maximum number of messages that can show on the screen at once.
 ## If the messages are set to display for a long time, messages will be queued
@@ -34,22 +51,10 @@ var is_moving_message_off_screen: bool = false
 
 var number_messages_processing: int = 0
 
-# Part of screen where the popups display. Didn't bother with left and right 
-# as it doesn't seem like normal behaviour for a message message of this 
-# kind
-enum MessageScreenPosition {
-	TOP,
-	BOTTOM,
-}
 
-# The direction messages move to/from the screen
-enum MessageMoveDirection {
-	NONE,
-	TOP,
-	BOTTOM,
-	LEFT,
-	RIGHT,
-}
+func _ready():
+	print("message_exit_direction number value: ", message_exit_direction)
+	print("message_exit_direction: ", MessageMoveDirection.keys()[2])
 
 
 # Adds a message to message_text_queue and queues the processing of this object. This should be all
@@ -179,6 +184,11 @@ func move_message_initial(message: SMSMessage):
 	var start_position: Vector2 = get_message_start_position(message)
 	var target_position: Vector2 = get_message_target_position(message)
 	
+	print("--", message.name, "--")
+	print("Start Position: ", start_position)
+	print("Target Position: ", target_position)
+	print("")
+	
 	message.visible = true
 	message.position = start_position
 	
@@ -209,7 +219,7 @@ func move_message_off_screen(message: SMSMessage):
 	
 	var message_size_y: float = message.size.y	
 	
-	message.set_exit_config_target_position(get_message_exit_position(message))	
+	message.set_config_target_position(SMSMessage.SMSMessageConfigType.EXIT, get_message_exit_position(message))
 	message.move_and_delete(get_message_exit_position(message), true)
 	
 	await message.delete_message
@@ -366,19 +376,18 @@ func get_message_start_position(message: SMSMessage) -> Vector2:
 	var start_position_x: float
 	var start_position_y: float
 	var start_position: Vector2
-	
-	if message_source_direction == MessageMoveDirection.NONE:		
-		pass
-	
+		
+	print("message screen position: ", MessageScreenPosition.keys()[message_screen_position])
+	print("message source Direction: ",  MessageMoveDirection.keys()[message_source_direction])
 	# There's a way to do tbe below in fewer lines, but I find this more readable and 
 	# I doubt it takes much more time to process
 	if message_screen_position == MessageScreenPosition.TOP:
-		if message_source_direction == MessageMoveDirection.NONE:
+		if message_source_direction == MessageMoveDirection.NONE:			
 			start_position_x = message.position.x
 			start_position_y = 0
 		elif message_source_direction == MessageMoveDirection.TOP:
 			start_position_x = message.position.x
-			start_position_y = message.position.y - message.size.y
+			start_position_y = -message.size.y
 		elif message_source_direction == MessageMoveDirection.BOTTOM:
 			start_position_x = message.position.x
 			start_position_y = viewport_size.y + message.size.y
@@ -439,12 +448,16 @@ func get_message_exit_position(message: SMSMessage) -> Vector2:
 	var exit_position: Vector2	
 	
 	if message_exit_direction == MessageMoveDirection.NONE:
+		print("asjdkhaksjdhk")
 		return Vector2(message.position)
+
+	print("message exit direction: ", MessageMoveDirection.keys()[message_exit_direction])
 
 	# There's a way to do tbe below in fewer lines, but I find this more readable and 
 	# I doubt it takes much more time to process if there is any difference at all
 	if message_screen_position == MessageScreenPosition.TOP:
 		if message_exit_direction == MessageMoveDirection.TOP:
+			
 			exit_position_x = message.position.x
 			exit_position_y = 0 - message.size.y
 		elif message_exit_direction == MessageMoveDirection.BOTTOM:

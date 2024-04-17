@@ -1,0 +1,2 @@
+extends SMSMessageShaderParams
+class_name SMSMessagePanelContainerShaderParams

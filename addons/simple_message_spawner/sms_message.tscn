@@ -15,21 +15,21 @@
 [sub_resource type="Resource" id="Resource_jyrpa"]
 script = ExtResource("3_f7vwm")
 use_panel_container_colour = true
-panel_container_colour = Color(0, 0, 0, 1)
+panel_container_colour = Color(1, 1, 1, 1)
 use_text_colour = false
 text_colour = Color(0, 0, 0, 1)
 use_text_outline_colour = false
 text_outline_colour = Color(1, 0.270588, 0, 1)
 use_text_shadow_colour = false
 text_shadow_colour = Color(0.545098, 0, 0, 1)
-image_modulation = Color(1, 1, 1, 1)
+image_modulation = Color(1, 1, 1, 0)
 colour_change_duration = 0.4
 colour_tween_transition_type = 0
 colour_tween_ease_type = 2
 
 [sub_resource type="Resource" id="Resource_uvkx6"]
 script = ExtResource("5_lychw")
-move_duration = 2.0
+move_duration = 0.4
 move_tween_transition_type = 7
 move_tween_ease_type = 2
 
@@ -44,7 +44,7 @@ text_outline_colour = Color(0, 0.866667, 0.396078, 1)
 use_text_shadow_colour = false
 text_shadow_colour = Color(0.917647, 0.741176, 0, 1)
 image_modulation = Color(1, 1, 1, 1)
-colour_change_duration = 2.0
+colour_change_duration = 10.0
 colour_tween_transition_type = 0
 colour_tween_ease_type = 2
 
@@ -57,7 +57,7 @@ script = ExtResource("5_f8wcg")
 target_texture = ExtResource("7_ouwjk")
 use_shader = true
 texture_shader_material = SubResource("ShaderMaterial_gphj8")
-target_texture_modulation = Color(1, 1, 1, 1)
+target_texture_modulation = Color(1, 0.317647, 1, 1)
 change_time = 0.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_3p1cb"]
@@ -68,11 +68,12 @@ texture_margin_right = 5.0
 texture_margin_bottom = 5.0
 axis_stretch_horizontal = 2
 axis_stretch_vertical = 2
+modulate_color = Color(1, 0.235294, 1, 1)
 
 [sub_resource type="Resource" id="Resource_oobqp"]
 script = ExtResource("5_f8wcg")
 target_texture = SubResource("StyleBoxTexture_3p1cb")
-use_shader = true
+use_shader = false
 texture_shader_material = ExtResource("1_p35mi")
 target_texture_modulation = Color(1, 0.231373, 1, 1)
 change_time = 4.0
@@ -185,14 +186,12 @@ _data = {
 }
 
 [node name="SMSMessage" type="PanelContainer"]
-material = ExtResource("1_p35mi")
 anchors_preset = 10
 anchor_right = 1.0
 offset_bottom = 90.0
 grow_horizontal = 2
-theme_override_styles/panel = ExtResource("3_rkkwc")
 script = ExtResource("2_vnlh0")
-display_time = 3.0
+display_time = 1.5
 start_colour_config = SubResource("Resource_jyrpa")
 start_panel_container_texture = ExtResource("3_rkkwc")
 display_config = SubResource("Resource_j7jjp")

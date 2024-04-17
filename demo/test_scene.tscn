@@ -8,8 +8,6 @@
 script = ExtResource("1_wkgbj")
 
 [node name="MessageSpawner" parent="." instance=ExtResource("2_gbyod")]
-message_source_direction = 1
-message_exit_direction = 3
 
 [node name="PanelContainer" type="PanelContainer" parent="."]
 offset_right = 354.0

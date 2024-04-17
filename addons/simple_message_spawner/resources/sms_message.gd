@@ -183,9 +183,7 @@ func set_initial_modulations_and_textures():
 	
 	# Set start colours of the relevant nodes	
 	if start_colour_config.use_panel_container_colour == true:
-		#self_modulate = start_colour_config.panel_container_colour
-		var theme_override_panel: StyleBoxTexture = get("theme_override_styles/panel")
-		theme_override_panel.set("modulate_color", start_colour_config.panel_container_colour)
+		self_modulate = start_colour_config.panel_container_colour
 	
 	if start_colour_config.use_text_colour == true:
 		message_rich_label.set("theme_override_colors/default_color", start_colour_config.text_colour)
@@ -353,18 +351,19 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 			panel_colour_tween = create_tween()
 			panel_colour_tween.set_parallel(true)
 			var obj: StyleBoxTexture = self["theme_override_styles/panel"]
-			print("name: ", name)
-			print("obj: ", obj)
-			print("modulate_color: ", obj["modulate_color"])
-			print("target_colour: ", target_colour_config.panel_container_colour)
-			print("colour_change_duration: ", colour_change_duration)
-			print(" ")
-			panel_colour_tween.tween_property(obj, "modulate_color", target_colour_config.panel_container_colour, colour_change_duration)
-			
-			#panel_colour_tween = start_colour_change_tween(self, "self_modulate",
-				#target_colour_config.panel_container_colour,
-				#colour_change_duration,
-				#target_config)
+			#print("name: ", name)
+			#print("obj: ", obj)
+			#print("modulate_color: ", obj["modulate_color"])
+			#print("target_colour: ", target_colour_config.panel_container_colour)
+			#print("colour_change_duration: ", colour_change_duration)
+			#print(" ")
+			#panel_colour_tween.tween_property(obj, "modulate_color", target_colour_config.panel_container_colour, colour_change_duration)
+			panel_colour_tween.tween_property(self, "self_modulate", target_colour_config.panel_container_colour, colour_change_duration)
+			panel_colour_tween = start_colour_change_tween(self, 
+				"self_modulate", 
+				target_colour_config.panel_container_colour, 
+				colour_change_duration, 
+				target_config)
 		
 		if target_colour_config.use_text_colour == true:
 			text_colour_tween = start_colour_change_tween(message_rich_label,
@@ -388,25 +387,26 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 				target_config)
 	
 	#Shader stuff
-	if target_panel_container_texture_config != null:
-		print("target_panel_container_texture_config is not null")
-		if target_panel_container_texture_config.use_shader == true:
-			# The duration of the shaders should not be longer than the move duration
-			# If it does, it could cause issues if there are additional shaders for the same
-			# texture
-			var shader_duration = clampf(target_panel_container_texture_config.change_time, 
-									0,
-									display_config.move_config.move_duration)
-			var panel_container_shader_material: ShaderMaterial = target_panel_container_texture_config.texture_shader_material
+	if (target_panel_container_texture_config != null &&
+		target_panel_container_texture_config.use_shader == true):		
+		# The duration of the shaders should not be longer than the move duration
+		# If it does, it could cause issues if there are additional shaders for the same
+		# texture
+		print("Doing shader stuff")
+		var shader_duration = clampf(target_panel_container_texture_config.change_time, 
+								0,
+								display_config.move_config.move_duration)
+		var panel_container_shader_material: ShaderMaterial = target_panel_container_texture_config.texture_shader_material
+		
+		if panel_container_shader_material != null:
 			
-			if panel_container_shader_material != null:
-				# duplicate the material so not all messages are changed at the same time
-				panel_container_shader_material = panel_container_shader_material.duplicate()
-				material = panel_container_shader_material
-				var panel_container_shader_tween = start_panel_container_shader(
-					panel_container_shader_material,
-					target_panel_container_texture_config,
-					shader_duration)
+			# duplicate the material so not all messages are changed at the same time
+			panel_container_shader_material = panel_container_shader_material.duplicate()
+			material = panel_container_shader_material
+			var panel_container_shader_tween = start_panel_container_shader(
+				panel_container_shader_material,
+				target_panel_container_texture_config,
+				shader_duration)
 	
 	if terminate_after == false:
 		move_tween.tween_callback(finish_move).set_delay(target_config.move_config.move_duration)
@@ -424,17 +424,20 @@ func start_panel_container_shader(shader_material: ShaderMaterial,
 	var panel_container_texture_tween: Tween = create_tween()
 	
 	panel_container_texture_tween.tween_method(set_fade_shader_value.bind(shader_material), 0.0, 1.0, shader_duration)
-	panel_container_texture_tween.tween_callback(finish_panel_container_shader)
+	panel_container_texture_tween.tween_callback(finish_panel_container_shader.bind(texture_config))
 	return panel_container_texture_tween
 	self_modulate = Color.PURPLE
 
 
-func finish_panel_container_shader():
+func finish_panel_container_shader(texture_config: SMSMessageTextureConfig):
+	# Set the material to null since the next move might not use a shader, but
+	# could want to use colour on the texture.
+	self["theme_override_styles/panel"] = texture_config.target_texture
 	material = null
 
 
 func set_fade_shader_value(value: float, shader_material: ShaderMaterial):
-	print("Value: ", value)
+	#print("Value: ", value)
 	shader_material.set_shader_parameter("weight", value)
 	pass
 
@@ -460,9 +463,9 @@ func start_colour_change_tween(control_node: Control, property: String,
 		target_colour: Color, duration: float, target_config: SMSMessageConfig) -> Tween:	
 	var colour_change_tween: Tween = create_tween()
 	
-	print("control_node: ", control_node.name)
-	print("property: ", property)
-	print("target_colour: ", target_colour)
+	#print("control_node: ", control_node.name)
+	#print("property: ", property)
+	#print("target_colour: ", target_colour)
 	if (control_node[property] == null):
 		#print("Adding property '", property, "' to control node ", control_node.name)
 		control_node.set(property, Color.WHITE)
