@@ -48,7 +48,7 @@ func test_messages() -> void:
 	
 	message_spawner.add_message("1.\nsome test\nsummor text\njdkfs\n437289\n")
 	#message_spawner.add_message("1.")
-	#message_spawner.add_message("2. \n 23784 \n fdsjsdhfkj \n 6fds78f\n fjsdhsfkdjhdfs \n 890234\nds")
+	message_spawner.add_message("2. \n 23784 \n fdsjsdhfkj \n 6fds78f\n fjsdhsfkdjhdfs \n 890234\nds")
 	message_spawner.add_message("3.")
 	message_spawner.add_message("4.")
 	message_spawner.add_message("5.")

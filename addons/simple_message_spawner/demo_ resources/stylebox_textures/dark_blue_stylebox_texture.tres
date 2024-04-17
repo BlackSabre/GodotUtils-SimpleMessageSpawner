@@ -1,7 +1,6 @@
 [gd_resource type="StyleBoxTexture" load_steps=2 format=3 uid="uid://p8y8v78vwdbl"]
 
-[sub_resource type="CompressedTexture2D" id="CompressedTexture2D_212i0"]
-load_path = "res://.godot/imported/panel.png-eda9faa71141bd15049c22372b3ccf3e.ctex"
+[ext_resource type="Texture2D" uid="uid://bpy8y1jl16asa" path="res://addons/simple_message_spawner/demo_ resources/images/godot_wink_texture.tres" id="1_tw45u"]
 
 [resource]
-texture = SubResource("CompressedTexture2D_212i0")
+texture = ExtResource("1_tw45u")

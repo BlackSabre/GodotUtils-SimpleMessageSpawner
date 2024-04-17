@@ -26,6 +26,10 @@ static var message_number_id: int = 1;
 ## panel colours and text, leave this as null.
 @export var start_panel_container_texture: StyleBox
 
+## Starting image config for an image in the message. This image will use the
+## MessageImage node. Leave blank to ignore the image.
+@export var start_panel_image_config: SMSMessageImageConfig
+
 
 @export_group("Display Config")
 
@@ -181,7 +185,7 @@ func set_initial_modulations_and_textures():
 		# the override
 		self.set("theme_override_styles/panel", start_panel_container_texture.duplicate())
 	
-	# Set start colours of the relevant nodes	
+	# Set start colours of the relevant nodes
 	if start_colour_config.use_panel_container_colour == true:
 		self_modulate = start_colour_config.panel_container_colour
 	
@@ -195,6 +199,14 @@ func set_initial_modulations_and_textures():
 	if start_colour_config.use_text_outline_colour == true:
 		print("Setting font outline colour")
 		message_rich_label.set("theme_override_colors/font_outline_color", start_colour_config.text_outline_colour)
+	
+	if (start_panel_image_config != null && start_panel_image_config.image_texture != null):
+		image_texture_rect.visible = true
+		image_texture_rect.texture = start_panel_image_config.image_texture
+		image_texture_rect.self_modulate = start_panel_image_config.self_modulate_colour
+	else:
+		print("ASJDAS")
+		image_texture_rect.visible = false
 
 
 func setup_display_timer():

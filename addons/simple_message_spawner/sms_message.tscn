@@ -1,9 +1,10 @@
-[gd_scene load_steps=31 format=3 uid="uid://cb2b3a4e5w2mb"]
+[gd_scene load_steps=33 format=3 uid="uid://cb2b3a4e5w2mb"]
 
 [ext_resource type="Material" uid="uid://eg28lx8n7mlp" path="res://addons/simple_message_spawner/demo_ resources/materials/dark_blue_material.tres" id="1_p35mi"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/sms_message.gd" id="2_vnlh0"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_colour_config.gd" id="3_f7vwm"]
 [ext_resource type="StyleBox" uid="uid://ck1hv0ebdt4cs" path="res://addons/simple_message_spawner/demo_ resources/stylebox_textures/light_blue_stylebox_texture.tres" id="3_rkkwc"]
+[ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_image_config.gd" id="4_sasvn"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_texture_config.gd" id="5_f8wcg"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_move_config.gd" id="5_lychw"]
 [ext_resource type="Texture2D" uid="uid://c8al55wsgjp08" path="res://addons/simple_message_spawner/demo_ resources/images/panel.png" id="6_48hgm"]
@@ -14,7 +15,7 @@
 
 [sub_resource type="Resource" id="Resource_jyrpa"]
 script = ExtResource("3_f7vwm")
-use_panel_container_colour = true
+use_panel_container_colour = false
 panel_container_colour = Color(1, 1, 1, 1)
 use_text_colour = false
 text_colour = Color(0, 0, 0, 1)
@@ -23,19 +24,26 @@ text_outline_colour = Color(1, 0.270588, 0, 1)
 use_text_shadow_colour = false
 text_shadow_colour = Color(0.545098, 0, 0, 1)
 image_modulation = Color(1, 1, 1, 0)
-colour_change_duration = 0.4
+colour_change_duration = 5.0
 colour_tween_transition_type = 0
 colour_tween_ease_type = 2
 
+[sub_resource type="Resource" id="Resource_nypv8"]
+script = ExtResource("4_sasvn")
+self_modulate_colour = Color(1, 1, 1, 1)
+is_atlas_image = false
+atlas_region_rect = Rect2(0, 0, 0, 0)
+margin = Rect2(0, 0, 0, 0)
+
 [sub_resource type="Resource" id="Resource_uvkx6"]
 script = ExtResource("5_lychw")
-move_duration = 0.4
+move_duration = 2.0
 move_tween_transition_type = 7
 move_tween_ease_type = 2
 
 [sub_resource type="Resource" id="Resource_okp1o"]
 script = ExtResource("3_f7vwm")
-use_panel_container_colour = true
+use_panel_container_colour = false
 panel_container_colour = Color(0.996078, 0.423529, 1, 1)
 use_text_colour = false
 text_colour = Color(1, 1, 1, 1)
@@ -188,12 +196,14 @@ _data = {
 [node name="SMSMessage" type="PanelContainer"]
 anchors_preset = 10
 anchor_right = 1.0
-offset_bottom = 90.0
+offset_bottom = 43.0
 grow_horizontal = 2
+theme_override_styles/panel = ExtResource("3_rkkwc")
 script = ExtResource("2_vnlh0")
-display_time = 1.5
+display_time = 4.0
 start_colour_config = SubResource("Resource_jyrpa")
 start_panel_container_texture = ExtResource("3_rkkwc")
+start_panel_image_config = SubResource("Resource_nypv8")
 display_config = SubResource("Resource_j7jjp")
 reorder_config = SubResource("Resource_2mm4l")
 exit_config = SubResource("Resource_bkpxo")
@@ -237,8 +247,7 @@ theme_override_constants/shadow_outline_size = 5
 theme_override_constants/outline_size = 30
 theme_override_fonts/normal_font = SubResource("FontFile_dvrij")
 bbcode_enabled = true
-text = "fafdssfdafdsfsdfsdasdjfkhjskdahjklhsadlkh gfdgdfsgdf
-sdaf"
+text = "fafdssfdafdsfsdfsdasdjfkhjskdahjklhsa"
 fit_content = true
 scroll_active = false
 shortcut_keys_enabled = false
