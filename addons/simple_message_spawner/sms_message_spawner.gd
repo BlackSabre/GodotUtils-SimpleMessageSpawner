@@ -52,11 +52,6 @@ var is_moving_message_off_screen: bool = false
 var number_messages_processing: int = 0
 
 
-func _ready():
-	print("message_exit_direction number value: ", message_exit_direction)
-	print("message_exit_direction: ", MessageMoveDirection.keys()[2])
-
-
 # Adds a message to message_text_queue and queues the processing of this object. This should be all
 # you need from this class to spawn messages unless you want different functionality
 func add_message(message_string: String):	
@@ -183,12 +178,7 @@ func move_message_initial(message: SMSMessage):
 	
 	var start_position: Vector2 = get_message_start_position(message)
 	var target_position: Vector2 = get_message_target_position(message)
-	
-	print("--", message.name, "--")
-	print("Start Position: ", start_position)
-	print("Target Position: ", target_position)
-	print("")
-	
+
 	message.visible = true
 	message.position = start_position
 	
@@ -376,9 +366,7 @@ func get_message_start_position(message: SMSMessage) -> Vector2:
 	var start_position_x: float
 	var start_position_y: float
 	var start_position: Vector2
-		
-	print("message screen position: ", MessageScreenPosition.keys()[message_screen_position])
-	print("message source Direction: ",  MessageMoveDirection.keys()[message_source_direction])
+	
 	# There's a way to do tbe below in fewer lines, but I find this more readable and 
 	# I doubt it takes much more time to process
 	if message_screen_position == MessageScreenPosition.TOP:
@@ -448,10 +436,7 @@ func get_message_exit_position(message: SMSMessage) -> Vector2:
 	var exit_position: Vector2	
 	
 	if message_exit_direction == MessageMoveDirection.NONE:
-		print("asjdkhaksjdhk")
 		return Vector2(message.position)
-
-	print("message exit direction: ", MessageMoveDirection.keys()[message_exit_direction])
 
 	# There's a way to do tbe below in fewer lines, but I find this more readable and 
 	# I doubt it takes much more time to process if there is any difference at all

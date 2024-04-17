@@ -205,7 +205,6 @@ func set_initial_modulations_and_textures():
 		image_texture_rect.texture = start_image_config.image_texture
 		image_texture_rect.self_modulate = start_image_config.self_modulate_colour
 	else:
-		print("ASJDAS")
 		image_texture_rect.visible = false
 
 
