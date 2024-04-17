@@ -6,3 +6,4 @@ res://addons/simple_message_spawner/demo_ resources/images/godot_wink_texture.tr
 res://addons/simple_message_spawner/demo_ resources/stylebox_textures/dark_blue_stylebox_texture.tres
 res://addons/simple_message_spawner/resources/sms_message_theme.tres
 res://addons/simple_message_spawner/demo_ resources/shaders/sms_message_texture_fade_out_fade_in_with_colour.gdshader
+res://addons/simple_message_spawner/resources/sms_message.gd
