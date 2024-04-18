@@ -11,8 +11,8 @@ class_name SMSMessageTextureConfig
 ## set
 @export var texture_shader_material: ShaderMaterial
 
-
-## Target modulation of the texture
+## Target modulation of the texture. If you're using a shader, this won't change
+## the modulation and you'll need to use a shader script to change colour.
 @export var target_texture_modulation: Color = Color.WHITE
 
 ## Time it takes to change to this texture.

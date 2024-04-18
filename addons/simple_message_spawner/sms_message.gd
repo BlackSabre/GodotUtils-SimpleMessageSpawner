@@ -28,7 +28,7 @@ static var message_number_id: int = 1;
 
 ## Starting image config for an image in the message. This image will use the
 ## MessageImage node. Leave blank to ignore the image.
-@export var start_image_config: SMSMessageImageConfig
+@export var start_image: Texture2D
 
 
 @export_group("Display Config")
@@ -200,10 +200,9 @@ func set_initial_modulations_and_textures():
 		print("Setting font outline colour")
 		message_rich_label.set("theme_override_colors/font_outline_color", start_colour_config.text_outline_colour)
 	
-	if (start_image_config != null && start_image_config.image_texture != null):
+	if (start_image != null):
 		image_texture_rect.visible = true
-		image_texture_rect.texture = start_image_config.image_texture
-		image_texture_rect.self_modulate = start_image_config.self_modulate_colour
+		image_texture_rect.texture = start_image
 	else:
 		image_texture_rect.visible = false
 
@@ -225,9 +224,7 @@ func set_message_name():
 	
 
 func adjust_size():
-	await get_tree().process_frame
-	#print("AS: Message: ", name, " size.y: ", size.y)
-	#print("AS: Message: ", name, " margin.size.y: ", message_margin_container.size.y)
+	await get_tree().process_frame	
 	var panel_container_height: float = size.y
 	var message_margin_container_height: float = message_margin_container.size.y
 	
@@ -340,6 +337,7 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 	
 	var target_colour_config: SMSMessageColourConfig = target_config.target_colour_config
 	var target_panel_container_texture_config: SMSMessageTextureConfig = target_config.target_panel_container_texture_config
+	var target_image_config: SMSMessageTextureConfig = target_config.target_image_texture_config
 	
 	# Create tween for changing colours of the various nodes and properties
 	var panel_colour_tween: Tween
@@ -397,7 +395,7 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 				colour_change_duration,
 				target_config)
 	
-	#Shader stuff
+	# Panel Container Shader stuff
 	if (target_panel_container_texture_config != null &&
 		target_panel_container_texture_config.use_shader == true):		
 		# The duration of the shaders should not be longer than the move duration
@@ -406,7 +404,7 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 		print("Doing shader stuff")
 		var shader_duration = clampf(target_panel_container_texture_config.change_time, 
 								0,
-								display_config.move_config.move_duration)
+								target_config.move_config.move_duration)
 		var panel_container_shader_material: ShaderMaterial = target_panel_container_texture_config.texture_shader_material
 		
 		if panel_container_shader_material != null:
@@ -418,6 +416,15 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 				panel_container_shader_material,
 				target_panel_container_texture_config,
 				shader_duration)
+	
+	# Image Stuff
+	#if target_image_config != null:
+		#var image_tween_duration = target_image_config.change_time
+		#clampf(image_tween_duration, 0, target_config.move_config.move_duration)
+		#var image_tween = create_tween()
+		#image_tween.set_parallel(true)
+		#image_tween.tween_property(image_texture_rect, "texture", target_image_config.target_texture, image_tween_duration)
+		#pass
 	
 	if terminate_after == false:
 		move_tween.tween_callback(finish_move).set_delay(target_config.move_config.move_duration)

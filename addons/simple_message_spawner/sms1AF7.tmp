@@ -1,13 +1,14 @@
 [gd_scene load_steps=31 format=3 uid="uid://cb2b3a4e5w2mb"]
 
 [ext_resource type="Material" uid="uid://eg28lx8n7mlp" path="res://addons/simple_message_spawner/demo_ resources/materials/dark_blue_material.tres" id="1_p35mi"]
-[ext_resource type="Script" path="res://addons/simple_message_spawner/sms_message.gd" id="2_6ues4"]
+[ext_resource type="Script" path="res://addons/simple_message_spawner/resources/sms_message.gd" id="2_vnlh0"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_colour_config.gd" id="3_f7vwm"]
 [ext_resource type="StyleBox" uid="uid://ck1hv0ebdt4cs" path="res://addons/simple_message_spawner/demo_ resources/stylebox_textures/light_blue_stylebox_texture.tres" id="3_rkkwc"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_texture_config.gd" id="5_f8wcg"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_move_config.gd" id="5_lychw"]
 [ext_resource type="Texture2D" uid="uid://c8al55wsgjp08" path="res://addons/simple_message_spawner/demo_ resources/images/panel.png" id="6_48hgm"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_config.gd" id="6_i74nk"]
+[ext_resource type="Texture2D" uid="uid://bpy8y1jl16asa" path="res://addons/simple_message_spawner/demo_ resources/images/godot_wink_texture.tres" id="7_hvqrn"]
 [ext_resource type="StyleBox" uid="uid://p8y8v78vwdbl" path="res://addons/simple_message_spawner/demo_ resources/stylebox_textures/dark_blue_stylebox_texture.tres" id="7_ouwjk"]
 [ext_resource type="Shader" path="res://addons/simple_message_spawner/demo_ resources/shaders/sms_message_texture_fade_out_fade_in.gdshader" id="9_v1a4m"]
 
@@ -25,10 +26,6 @@ image_modulation = Color(1, 1, 1, 0)
 colour_change_duration = 5.0
 colour_tween_transition_type = 0
 colour_tween_ease_type = 2
-
-[sub_resource type="AtlasTexture" id="AtlasTexture_riybq"]
-atlas = ExtResource("6_48hgm")
-region = Rect2(0, 0, 16, 16)
 
 [sub_resource type="Resource" id="Resource_uvkx6"]
 script = ExtResource("5_lychw")
@@ -58,7 +55,7 @@ shader_parameter/weight = null
 [sub_resource type="Resource" id="Resource_nrrtp"]
 script = ExtResource("5_f8wcg")
 target_texture = ExtResource("7_ouwjk")
-use_shader = false
+use_shader = true
 texture_shader_material = SubResource("ShaderMaterial_gphj8")
 target_texture_modulation = Color(1, 0.317647, 1, 1)
 change_time = 0.0
@@ -140,6 +137,8 @@ script = ExtResource("6_i74nk")
 move_config = SubResource("Resource_6upxn")
 target_colour_config = SubResource("Resource_ltffq")
 
+[sub_resource type="ShaderMaterial" id="ShaderMaterial_cdlpy"]
+
 [sub_resource type="FontFile" id="FontFile_dvrij"]
 cache/0/16/0/ascent = 0.0
 cache/0/16/0/descent = 0.0
@@ -180,14 +179,10 @@ tracks/0/keys = {
 "values": [Rect2(0, 0, 128, 128), Rect2(129, 0, 128, 128), Rect2(258, 0, 128, 128), Rect2(387, 0, 128, 128), Rect2(0, 129, 128, 128), Rect2(387, 0, 128, 128), Rect2(258, 0, 128, 128), Rect2(129, 0, 128, 128), Rect2(0, 0, 128, 128)]
 }
 
-[sub_resource type="Animation" id="Animation_pd7j6"]
-resource_name = "idle"
-
 [sub_resource type="AnimationLibrary" id="AnimationLibrary_2lpqs"]
 _data = {
 "RESET": SubResource("Animation_ik31k"),
-"godot_icon_wink": SubResource("Animation_43yxj"),
-"idle": SubResource("Animation_pd7j6")
+"godot_icon_wink": SubResource("Animation_43yxj")
 }
 
 [node name="SMSMessage" type="PanelContainer"]
@@ -196,11 +191,10 @@ anchor_right = 1.0
 offset_bottom = 43.0
 grow_horizontal = 2
 theme_override_styles/panel = ExtResource("3_rkkwc")
-script = ExtResource("2_6ues4")
+script = ExtResource("2_vnlh0")
 display_time = 4.0
 start_colour_config = SubResource("Resource_jyrpa")
 start_panel_container_texture = ExtResource("3_rkkwc")
-start_image = SubResource("AtlasTexture_riybq")
 display_config = SubResource("Resource_j7jjp")
 reorder_config = SubResource("Resource_2mm4l")
 exit_config = SubResource("Resource_bkpxo")
@@ -225,8 +219,10 @@ size_flags_horizontal = 2
 size_flags_stretch_ratio = 0.0
 
 [node name="MessageImage" type="TextureRect" parent="MessageMarginContainer/HBoxContainer/ImageMarginContainer"]
+material = SubResource("ShaderMaterial_cdlpy")
 custom_minimum_size = Vector2(50, 50)
 layout_mode = 2
+texture = ExtResource("7_hvqrn")
 expand_mode = 1
 stretch_mode = 5
 
@@ -251,7 +247,7 @@ shortcut_keys_enabled = false
 libraries = {
 "": SubResource("AnimationLibrary_2lpqs")
 }
-autoplay = "idle"
+autoplay = "godot_icon_wink"
 
 [connection signal="mouse_entered" from="." to="." method="_on_mouse_entered"]
 [connection signal="mouse_exited" from="." to="." method="_on_mouse_exited"]

@@ -1,12 +1,9 @@
-res://addons/simple_message_spawner/sms_message.tscn
+res://demo/test_scene.tscn
 res://addons/simple_message_spawner/demo_ resources/shaders/sms_message_texture_fade_out_fade_in.gdshader
 res://addons/simple_message_spawner/demo_ resources/materials/dark_blue_material.tres
 res://addons/simple_message_spawner/demo_ resources/stylebox_textures/light_blue_stylebox_texture.tres
-res://addons/simple_message_spawner/demo_ resources/images/godot_wink_texture.tres
 res://addons/simple_message_spawner/demo_ resources/stylebox_textures/dark_blue_stylebox_texture.tres
-res://addons/simple_message_spawner/resources/sms_message_theme.tres
 res://addons/simple_message_spawner/demo_ resources/shaders/sms_message_texture_fade_out_fade_in_with_colour.gdshader
-res://addons/simple_message_spawner/resources/sms_message.gd
-res://addons/simple_message_spawner/sms_message_spawner.tscn
-res://addons/simple_message_spawner/sms_message_spawner.gd
-res://demo/test_scene.tscn
+res://addons/simple_message_spawner/resources/sms_message_theme.tres
+res://addons/simple_message_spawner/sms_message.tscn
+res://addons/simple_message_spawner/sms_message.gd
