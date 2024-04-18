@@ -61,7 +61,7 @@ target_texture = ExtResource("7_ouwjk")
 use_shader = false
 texture_shader_material = SubResource("ShaderMaterial_gphj8")
 target_texture_modulation = Color(1, 0.317647, 1, 1)
-change_time = 0.0
+change_time = 5.0
 
 [sub_resource type="StyleBoxTexture" id="StyleBoxTexture_3p1cb"]
 texture = ExtResource("6_48hgm")

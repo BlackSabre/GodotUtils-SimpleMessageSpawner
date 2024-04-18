@@ -59,7 +59,7 @@ static var message_number_id: int = 1;
 
 
 @onready var message_rich_label: RichTextLabel = $MessageMarginContainer/HBoxContainer/RichTextMessageLabel
-@onready var image_texture_rect: TextureRect = $MessageMarginContainer/HBoxContainer/ImageMarginContainer/MessageImage
+@onready var message_image: TextureRect = $MessageMarginContainer/HBoxContainer/ImageMarginContainer/MessageImage
 @onready var message_margin_container: MarginContainer = $MessageMarginContainer
 @onready var message_sound: AudioStreamPlayer = $MessageSound
 
@@ -168,7 +168,7 @@ func check_themes():
 
 
 func set_initial_modulations_and_textures():
-	#image_texture_rect.self_modulate = start_image_modulation
+	
 	#self_modulate.a = 1
 	#self.visible = false
 	self.modulate.a = 0
@@ -201,10 +201,10 @@ func set_initial_modulations_and_textures():
 		message_rich_label.set("theme_override_colors/font_outline_color", start_colour_config.text_outline_colour)
 	
 	if (start_image != null):
-		image_texture_rect.visible = true
-		image_texture_rect.texture = start_image
+		message_image.visible = true
+		message_image.texture = start_image
 	else:
-		image_texture_rect.visible = false
+		message_image.visible = false
 
 
 func setup_display_timer():
@@ -417,14 +417,28 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 				target_panel_container_texture_config,
 				shader_duration)
 	
-	# Image Stuff
-	#if target_image_config != null:
-		#var image_tween_duration = target_image_config.change_time
-		#clampf(image_tween_duration, 0, target_config.move_config.move_duration)
+	# Image tweening and image shaders
+	if target_image_config != null:
+		var image_tween_duration = target_image_config.change_time
+		image_tween_duration = clampf(image_tween_duration, 0, target_config.move_config.move_duration)
+		
+		if target_config.target_image_texture_config.use_shader == false:
+			var target_image_modulation: Color = target_image_config.target_texture_modulation
+			var image_modulation_tween = start_colour_change_tween(
+				message_image,
+				"self_modulate",
+				target_image_config.target_texture_modulation,
+				image_tween_duration,
+				target_config
+			)
+		else:
+			#image shader
+			pass
+		
+		
+		
 		#var image_tween = create_tween()
 		#image_tween.set_parallel(true)
-		#image_tween.tween_property(image_texture_rect, "texture", target_image_config.target_texture, image_tween_duration)
-		#pass
 	
 	if terminate_after == false:
 		move_tween.tween_callback(finish_move).set_delay(target_config.move_config.move_duration)
