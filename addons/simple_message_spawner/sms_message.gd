@@ -151,8 +151,6 @@ func check_themes():
 		#print("Has override theme")
 		has_override_theme = true
 	
-	#original_style_box_override = theme_override_style
-	
 	if theme_override_style is StyleBoxTexture:
 		#print("Do this to StyleBoxTexture")
 		theme_override_type = ThemeOverrideType.STYLEBOX_TEXTURE
@@ -168,7 +166,6 @@ func check_themes():
 
 
 func set_initial_modulations_and_textures():
-	
 	#self_modulate.a = 1
 	#self.visible = false
 	self.modulate.a = 0
@@ -221,7 +218,7 @@ func setup_display_timer():
 func set_message_name():
 	name = "SMSMessage" + var_to_str(message_number_id)
 	message_number_id += 1
-	
+
 
 func adjust_size():
 	await get_tree().process_frame	
@@ -240,6 +237,7 @@ func get_height() -> float:
 	#print("GH: Message: ", name, " size.y: ", size.y)
 	#print("GH: Message: ", name, " margin.size.y: ", message_margin_container.size.y)
 	return size.y
+
 
 func handle_mouse_click():
 	if handling_mouse_click == true:
@@ -260,6 +258,7 @@ func set_label_text(new_text: String) -> void:
 func set_config_target_position(config_type: SMSMessageConfigType, target_position: Vector2) -> void:
 	var config: SMSMessageConfig = get_message_config_from_enum(config_type)
 	config.move_config.position = target_position
+
 
 # sets the target_position in display_message_config
 func set_display_config_target_position(target_position: Vector2):
@@ -419,6 +418,7 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 	
 	# Image tweening and image shaders
 	if target_image_config != null:
+		# Tween colour modulation for image
 		var image_tween_duration = target_image_config.change_time
 		image_tween_duration = clampf(image_tween_duration, 0, target_config.move_config.move_duration)
 		
@@ -432,18 +432,92 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 				target_config
 			)
 		else:
-			#image shader
-			pass
-		
-		
-		
-		#var image_tween = create_tween()
-		#image_tween.set_parallel(true)
+			# Tween shader values for image
+			var image_shader_material: ShaderMaterial = target_image_config.texture_shader_material.duplicate()
+			
+			start_shader_tweens(
+				target_image_config.texture_shader_material,
+				target_image_config,
+				image_tween_duration)
 	
 	if terminate_after == false:
 		move_tween.tween_callback(finish_move).set_delay(target_config.move_config.move_duration)
 	else:
 		move_tween.tween_callback(finish_move_and_delete).set_delay(target_config.move_config.move_duration)
+
+
+func start_shader_tweens(shader_material: ShaderMaterial, 
+		texture_config: SMSMessageTextureConfig,
+		shader_duration) -> Array[Tween]:
+	message_image.material = shader_material
+	var shader_tween_array: Array[Tween]
+	if shader_material == null:
+		return shader_tween_array
+	
+	var shader_parameters_config: SMSMessageShaderParameters = texture_config.shader_parameters
+	if shader_parameters_config == null:
+		return shader_tween_array
+	
+	var shader_parameters: Array[SMSMessageShaderParameter] = texture_config.shader_parameters.parameter_array
+	
+	for parameter: SMSMessageShaderParameter in shader_parameters:
+		var parameter_value: Variant = parameter.get_parameter_value()
+		var current_shader_parameter: Variant = shader_material.get_shader_parameter(parameter.parameter_name)
+		var parameter_type: SMSMessageShaderParameter.SMSMessagerShaderParameterType
+		
+		print("Parameter: ", parameter.parameter_name)
+		
+		parameter_type = parameter.parameter_type
+		print("Parameter: ", parameter.parameter_name, " ; Value: ", parameter_value)
+		
+		if (parameter_value == null):
+			push_error("Parameter '", parameter.parameter_name, "' does not exist in the shader")
+			continue
+		
+		if parameter.tween_this_parameter == true:
+			print("Tween this thing")
+			print("Tween type: ", SMSMessageShaderParameter.SMSMessagerShaderParameterType.keys()[parameter_type])
+			var shader_tween: Tween = create_tween()
+			shader_tween.set_parallel(true)
+			
+			match parameter_type:
+				SMSMessageShaderParameter.SMSMessagerShaderParameterType.FLOAT:
+					print("Is float")
+					shader_tween.tween_method(
+						set_float_shader_tween_parameter.bind(parameter.parameter_name, shader_material), 
+						current_shader_parameter,
+						parameter_value,
+						shader_duration
+						)
+				SMSMessageShaderParameter.SMSMessagerShaderParameterType.INT:
+					shader_tween.tween_method(
+						set_int_shader_tween_parameter,
+						current_shader_parameter,
+						parameter_value,
+						shader_duration)
+				SMSMessageShaderParameter.SMSMessagerShaderParameterType.COLOUR:
+					shader_tween.tween_method(
+						set_colour_shader_tween_parameter,
+						current_shader_parameter,
+						parameter_value,
+						shader_duration
+						)
+				
+			shader_tween_array.append(shader_tween)
+		else:
+			shader_material.set_shader_parameter(parameter.parameter_name, parameter_value)
+		
+	
+	#var target = shader_parameters.get(val)
+	#print("\n Target: ", target)
+	#
+	#for param: Dictionary in all_parameters:
+		##print("Keys: ", param.keys())
+		##print("Values: ", param.values())
+		#pass
+	
+	return shader_tween_array
+	
 
 
 func start_panel_container_shader(shader_material: ShaderMaterial, 
@@ -467,6 +541,22 @@ func finish_panel_container_shader(texture_config: SMSMessageTextureConfig):
 	self["theme_override_styles/panel"] = texture_config.target_texture
 	material = null
 
+
+func set_float_shader_tween_parameter(float_value: float, parameter_name: String,
+		shader_material: ShaderMaterial):
+	print("Tweening property '", parameter_name, "'", " to ", float_value)
+	shader_material.set_shader_parameter(parameter_name, float_value)
+
+
+func set_int_shader_tween_parameter(int_value: int, parameter_name: String, 
+		shader_material: ShaderMaterial):
+	shader_material.set_shader_parameter(parameter_name, int_value)
+
+
+func set_colour_shader_tween_parameter(colour_value: Color, parameter_name: String,
+		shader_material: ShaderMaterial):
+	shader_material.set_shader_parameter(parameter_name, colour_value)
+	
 
 func set_fade_shader_value(value: float, shader_material: ShaderMaterial):
 	#print("Value: ", value)
@@ -516,10 +606,6 @@ func start_colour_change_tween(control_node: Control, property: String,
 	
 	return colour_change_tween
 
-
-func start_shader_tween(texture_config: SMSMessageTextureConfig, ) -> Tween:
-	return create_tween()
-	pass
 
 # moves this object to the target position using exit_message_config and deletes it 
 # afterwards

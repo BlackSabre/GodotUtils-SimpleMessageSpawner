@@ -8,8 +8,13 @@ class_name SMSMessageTextureConfig
 @export var use_shader: bool = false
 
 ## Material for the texture. This will not overwrite the material if it is already
-## set
+## set.
 @export var texture_shader_material: ShaderMaterial
+
+## Parameters for the shader. You'll need to add these yourself in the inspector and 
+## ensure that the parameter_name in each SMSMessageShaderParameter property 
+## matches the uniform variable value in the shader
+@export var shader_parameters: SMSMessageShaderParameters
 
 ## Target modulation of the texture. If you're using a shader, this won't change
 ## the modulation and you'll need to use a shader script to change colour.

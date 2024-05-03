@@ -1,19 +1,16 @@
-[gd_scene load_steps=37 format=3 uid="uid://cb2b3a4e5w2mb"]
+[gd_scene load_steps=33 format=3 uid="uid://cb2b3a4e5w2mb"]
 
 [ext_resource type="Material" uid="uid://eg28lx8n7mlp" path="res://addons/simple_message_spawner/demo_ resources/materials/dark_blue_material.tres" id="1_p35mi"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/sms_message.gd" id="2_6ues4"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_colour_config.gd" id="3_f7vwm"]
 [ext_resource type="StyleBox" uid="uid://ck1hv0ebdt4cs" path="res://addons/simple_message_spawner/demo_ resources/stylebox_textures/light_blue_stylebox_texture.tres" id="3_rkkwc"]
-[ext_resource type="Texture2D" uid="uid://beyjsibbyq8ai" path="res://addons/simple_message_spawner/demo_ resources/images/panel2_16x16.png" id="4_0l3x3"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_texture_config.gd" id="5_f8wcg"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_move_config.gd" id="5_lychw"]
 [ext_resource type="Texture2D" uid="uid://c8al55wsgjp08" path="res://addons/simple_message_spawner/demo_ resources/images/panel.png" id="6_48hgm"]
 [ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_config.gd" id="6_i74nk"]
 [ext_resource type="StyleBox" uid="uid://p8y8v78vwdbl" path="res://addons/simple_message_spawner/demo_ resources/stylebox_textures/dark_blue_stylebox_texture.tres" id="7_ouwjk"]
-[ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_shader_parameter.gd" id="8_e221d"]
-[ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_shader_parameters.gd" id="9_8fa4w"]
+[ext_resource type="Script" path="res://addons/simple_message_spawner/resources/config_classes/sms_message_shader_params.gd" id="8_npyv4"]
 [ext_resource type="Shader" path="res://addons/simple_message_spawner/demo_ resources/shaders/sms_message_texture_fade_out_fade_in.gdshader" id="9_v1a4m"]
-[ext_resource type="Texture2D" uid="uid://d070pybslkp5p" path="res://addons/simple_message_spawner/demo_ resources/images/panel_highlighted.png" id="12_jftgd"]
 
 [sub_resource type="Resource" id="Resource_jyrpa"]
 script = ExtResource("3_f7vwm")
@@ -31,7 +28,7 @@ colour_tween_transition_type = 0
 colour_tween_ease_type = 2
 
 [sub_resource type="AtlasTexture" id="AtlasTexture_riybq"]
-atlas = ExtResource("4_0l3x3")
+atlas = ExtResource("6_48hgm")
 region = Rect2(0, 0, 16, 16)
 
 [sub_resource type="Resource" id="Resource_uvkx6"]
@@ -55,28 +52,20 @@ colour_change_duration = 10.0
 colour_tween_transition_type = 0
 colour_tween_ease_type = 2
 
-[sub_resource type="Resource" id="Resource_3xrgj"]
-script = ExtResource("8_e221d")
-parameter_name = "weight"
-parameter_type = 0
-parameter_float = 1.0
-tween_this_parameter = true
-
-[sub_resource type="Resource" id="Resource_3suod"]
-script = ExtResource("9_8fa4w")
-parameter_array = Array[ExtResource("8_e221d")]([SubResource("Resource_3xrgj")])
+[sub_resource type="Resource" id="Resource_jtaau"]
+script = ExtResource("8_npyv4")
+target_colour = Color(0, 0, 0, 1)
 
 [sub_resource type="ShaderMaterial" id="ShaderMaterial_gphj8"]
 shader = ExtResource("9_v1a4m")
-shader_parameter/weight = 0.0
-shader_parameter/target_texture = ExtResource("12_jftgd")
+shader_parameter/weight = null
 
 [sub_resource type="Resource" id="Resource_nrrtp"]
 script = ExtResource("5_f8wcg")
 target_texture = ExtResource("7_ouwjk")
 use_shader = true
 texture_shader_material = SubResource("ShaderMaterial_gphj8")
-shader_parameters = SubResource("Resource_3suod")
+shader_params = SubResource("Resource_jtaau")
 target_texture_modulation = Color(1, 0.317647, 1, 1)
 change_time = 5.0
 

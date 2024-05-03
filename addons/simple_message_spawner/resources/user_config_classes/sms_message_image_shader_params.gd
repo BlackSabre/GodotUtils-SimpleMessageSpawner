@@ -1,2 +1,0 @@
-extends SMSMessageShaderParams
-class_name SMSMessageImageShaderParams
