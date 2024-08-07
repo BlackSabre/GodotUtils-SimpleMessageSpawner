@@ -1,13 +1,13 @@
 ea4bc82a6ad023ab7ee23ee620429895
-::res://::1714193253
+::res://::1723018239
 icon.svg::CompressedTexture2D::8386100767944705208::1705734510::1705734515::1::::<><>::
 ::res://addons/::1711080943
-::res://addons/simple_message_spawner/::1714147617
-sms_message.gd::GDScript::-1::1714147593::0::1::::SMSMessage<>PanelContainer<>::
-sms_message.tscn::PackedScene::4898879174628008149::1714147617::0::1::::<><>::uid://eg28lx8n7mlp::::res://addons/simple_message_spawner/demo_ resources/materials/dark_blue_material.tres<>res://addons/simple_message_spawner/sms_message.gd<>res://addons/simple_message_spawner/resources/config_classes/sms_message_colour_config.gd<>uid://ck1hv0ebdt4cs::::res://addons/simple_message_spawner/demo_ resources/stylebox_textures/light_blue_stylebox_texture.tres<>uid://beyjsibbyq8ai::::res://addons/simple_message_spawner/demo_ resources/images/panel2_16x16.png<>res://addons/simple_message_spawner/resources/config_classes/sms_message_texture_config.gd<>res://addons/simple_message_spawner/resources/config_classes/sms_message_move_config.gd<>uid://c8al55wsgjp08::::res://addons/simple_message_spawner/demo_ resources/images/panel.png<>res://addons/simple_message_spawner/resources/config_classes/sms_message_config.gd<>uid://p8y8v78vwdbl::::res://addons/simple_message_spawner/demo_ resources/stylebox_textures/dark_blue_stylebox_texture.tres<>res://addons/simple_message_spawner/resources/config_classes/sms_message_shader_parameter.gd<>res://addons/simple_message_spawner/resources/config_classes/sms_message_shader_parameters.gd<>res://addons/simple_message_spawner/demo_ resources/shaders/sms_message_texture_fade_out_fade_in.gdshader
+::res://addons/simple_message_spawner/::1722590800
+sms_message.gd::GDScript::-1::1720601051::0::1::::SMSMessage<>PanelContainer<>::
+sms_message.tscn::PackedScene::4898879174628008149::1722590800::0::1::::<><>::uid://eg28lx8n7mlp::::res://addons/simple_message_spawner/demo_ resources/materials/dark_blue_material.tres<>res://addons/simple_message_spawner/sms_message.gd<>res://addons/simple_message_spawner/resources/config_classes/sms_message_colour_config.gd<>uid://ck1hv0ebdt4cs::::res://addons/simple_message_spawner/demo_ resources/stylebox_textures/light_blue_stylebox_texture.tres<>uid://beyjsibbyq8ai::::res://addons/simple_message_spawner/demo_ resources/images/panel2_16x16.png<>res://addons/simple_message_spawner/resources/config_classes/sms_message_texture_config.gd<>res://addons/simple_message_spawner/resources/config_classes/sms_message_move_config.gd<>uid://c8al55wsgjp08::::res://addons/simple_message_spawner/demo_ resources/images/panel.png<>res://addons/simple_message_spawner/resources/config_classes/sms_message_config.gd<>uid://p8y8v78vwdbl::::res://addons/simple_message_spawner/demo_ resources/stylebox_textures/dark_blue_stylebox_texture.tres<>res://addons/simple_message_spawner/resources/config_classes/sms_message_shader_parameter.gd<>res://addons/simple_message_spawner/resources/config_classes/sms_message_shader_parameters.gd<>res://addons/simple_message_spawner/demo_ resources/shaders/sms_message_texture_fade_out_fade_in.gdshader<>uid://d070pybslkp5p::::res://addons/simple_message_spawner/demo_ resources/images/panel_highlighted.png
 sms_message_mover.gd::GDScript::-1::1706957532::0::1::::SMSMessageMover<>Node<>::
-sms_message_spawner.gd::GDScript::-1::1714146623::0::1::::SMSMessageSpawner<>CanvasLayer<>::
-sms_message_spawner.tscn::PackedScene::8607270566741392236::1714147124::0::1::::<><>::res://addons/simple_message_spawner/sms_message_spawner.gd
+sms_message_spawner.gd::GDScript::-1::1722588023::0::1::::SMSMessageSpawner<>CanvasLayer<>::
+sms_message_spawner.tscn::PackedScene::8607270566741392236::1722590799::0::1::::<><>::res://addons/simple_message_spawner/sms_message_spawner.gd
 ::res://addons/simple_message_spawner/demo_ resources/::1712485559
 ::res://addons/simple_message_spawner/demo_ resources/images/::1713368201
 godotIconWink128x128.png::CompressedTexture2D::1042193567423982604::1708667391::1708848666::1::::<><>::
@@ -15,17 +15,17 @@ godot_wink_texture.tres::AtlasTexture::3490846304222129180::1713368201::0::1::::
 panel2_16x16.png::CompressedTexture2D::2717300143377631596::1712241216::1712241216::1::::<><>::
 panel.png::CompressedTexture2D::7089796278691277847::1708933451::1709032470::1::::<><>::
 panel_highlighted.png::CompressedTexture2D::8981589204825917255::1709887225::1709887235::1::::<><>::
-::res://addons/simple_message_spawner/demo_ resources/materials/::1714146579
-dark_blue_material.tres::ShaderMaterial::294840545885410789::1714146579::0::1::::<><>::res://addons/simple_message_spawner/demo_ resources/shaders/sms_message_texture_fade_out_fade_in.gdshader<>uid://c8al55wsgjp08::::res://addons/simple_message_spawner/demo_ resources/images/panel.png
-::res://addons/simple_message_spawner/demo_ resources/shaders/::1714147620
-sms_message_texture_fade_out_fade_in.gdshader::Shader::-1::1714147620::0::1::::<><>::
-sms_message_texture_fade_out_fade_in_with_colour.gdshader::Shader::-1::1714147620::0::1::::<><>::
-::res://addons/simple_message_spawner/demo_ resources/stylebox_textures/::1714146579
-dark_blue_stylebox_texture.tres::StyleBoxTexture::1122474413432109657::1714146579::0::1::::<><>::uid://bpy8y1jl16asa::::res://addons/simple_message_spawner/demo_ resources/images/godot_wink_texture.tres
-light_blue_stylebox_texture.tres::StyleBoxTexture::5528867465306644274::1714146579::0::1::::<><>::uid://beyjsibbyq8ai::::res://addons/simple_message_spawner/demo_ resources/images/panel2_16x16.png
-::res://addons/simple_message_spawner/resources/::1714146579
+::res://addons/simple_message_spawner/demo_ resources/materials/::1722588023
+dark_blue_material.tres::ShaderMaterial::294840545885410789::1722588023::0::1::::<><>::res://addons/simple_message_spawner/demo_ resources/shaders/sms_message_texture_fade_out_fade_in.gdshader<>uid://c8al55wsgjp08::::res://addons/simple_message_spawner/demo_ resources/images/panel.png
+::res://addons/simple_message_spawner/demo_ resources/shaders/::1722599312
+sms_message_texture_fade_out_fade_in.gdshader::Shader::-1::1722599312::0::1::::<><>::
+sms_message_texture_fade_out_fade_in_with_colour.gdshader::Shader::-1::1722599312::0::1::::<><>::
+::res://addons/simple_message_spawner/demo_ resources/stylebox_textures/::1722588023
+dark_blue_stylebox_texture.tres::StyleBoxTexture::1122474413432109657::1722588023::0::1::::<><>::uid://bpy8y1jl16asa::::res://addons/simple_message_spawner/demo_ resources/images/godot_wink_texture.tres
+light_blue_stylebox_texture.tres::StyleBoxTexture::5528867465306644274::1722588023::0::1::::<><>::uid://beyjsibbyq8ai::::res://addons/simple_message_spawner/demo_ resources/images/panel2_16x16.png
+::res://addons/simple_message_spawner/resources/::1722588023
 sms_message_action.gd::GDScript::-1::1708168745::0::1::::SMSMessageAction<>Node<>::
-sms_message_theme.tres::Theme::2537094387231062744::1714146579::0::1::::<><>::
+sms_message_theme.tres::Theme::2537094387231062744::1722588023::0::1::::<><>::
 text_theme.tres::Theme::3323535323540380550::1711724302::0::1::::<><>::
 ::res://addons/simple_message_spawner/resources/config_classes/::1714146859
 sms_message_colour_config.gd::GDScript::-1::1712229902::0::1::::SMSMessageColourConfig<>Resource<>::
@@ -39,6 +39,6 @@ sms_message_texture_config.gd::GDScript::-1::1714106937::0::1::::SMSMessageTextu
 default_texture_16x16.png::CompressedTexture2D::3599470187459212857::1714107502::1714107504::1::::<><>::
 ::res://addons/simple_message_spawner/resources/user_config_classes/::1714123781
 sms_message_panel_container_shader_params.gd::GDScript::-1::1714123781::0::1::::SMSMessagePanelContainerShaderParams<>SMSMessageShaderParameters<>::
-::res://demo/::1714146579
+::res://demo/::1722590799
 test_scene.gd::GDScript::-1::1713364925::0::1::::<>Node2D<>::
-test_scene.tscn::PackedScene::2451775339092158483::1714146579::0::1::::<><>::res://demo/test_scene.gd<>uid://duvoqu6yn558s::::res://addons/simple_message_spawner/sms_message_spawner.tscn<>uid://bce8trn6jgasu::::res://addons/simple_message_spawner/resources/sms_message_theme.tres
+test_scene.tscn::PackedScene::2451775339092158483::1722590799::0::1::::<><>::res://demo/test_scene.gd<>uid://duvoqu6yn558s::::res://addons/simple_message_spawner/sms_message_spawner.tscn<>uid://bce8trn6jgasu::::res://addons/simple_message_spawner/resources/sms_message_theme.tres

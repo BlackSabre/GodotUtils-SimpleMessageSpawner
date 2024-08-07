@@ -436,7 +436,7 @@ func move(target_sms_message_config_type: SMSMessageConfigType,
 			var image_shader_material: ShaderMaterial = target_image_config.texture_shader_material.duplicate()
 			
 			start_shader_tweens(
-				target_image_config.texture_shader_material,
+				target_image_config.texture_shader_material.duplicate(),
 				target_image_config,
 				image_tween_duration)
 	
@@ -489,12 +489,14 @@ func start_shader_tweens(shader_material: ShaderMaterial,
 						parameter_value,
 						shader_duration
 						)
+				
 				SMSMessageShaderParameter.SMSMessagerShaderParameterType.INT:
 					shader_tween.tween_method(
 						set_int_shader_tween_parameter,
 						current_shader_parameter,
 						parameter_value,
 						shader_duration)
+				
 				SMSMessageShaderParameter.SMSMessagerShaderParameterType.COLOUR:
 					shader_tween.tween_method(
 						set_colour_shader_tween_parameter,
@@ -502,7 +504,7 @@ func start_shader_tweens(shader_material: ShaderMaterial,
 						parameter_value,
 						shader_duration
 						)
-				
+			
 			shader_tween_array.append(shader_tween)
 		else:
 			shader_material.set_shader_parameter(parameter.parameter_name, parameter_value)
@@ -517,7 +519,7 @@ func start_shader_tweens(shader_material: ShaderMaterial,
 		#pass
 	
 	return shader_tween_array
-	
+
 
 
 func start_panel_container_shader(shader_material: ShaderMaterial, 
@@ -544,7 +546,7 @@ func finish_panel_container_shader(texture_config: SMSMessageTextureConfig):
 
 func set_float_shader_tween_parameter(float_value: float, parameter_name: String,
 		shader_material: ShaderMaterial):
-	print("Tweening property '", parameter_name, "'", " to ", float_value)
+	#print("Tweening property '", parameter_name, "'", " to ", float_value)
 	shader_material.set_shader_parameter(parameter_name, float_value)
 
 
@@ -556,7 +558,7 @@ func set_int_shader_tween_parameter(int_value: int, parameter_name: String,
 func set_colour_shader_tween_parameter(colour_value: Color, parameter_name: String,
 		shader_material: ShaderMaterial):
 	shader_material.set_shader_parameter(parameter_name, colour_value)
-	
+
 
 func set_fade_shader_value(value: float, shader_material: ShaderMaterial):
 	#print("Value: ", value)

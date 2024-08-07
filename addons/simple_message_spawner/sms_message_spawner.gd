@@ -441,7 +441,7 @@ func get_message_exit_position(message: SMSMessage) -> Vector2:
 	# There's a way to do tbe below in fewer lines, but I find this more readable and 
 	# I doubt it takes much more time to process if there is any difference at all
 	if message_screen_position == MessageScreenPosition.TOP:
-		if message_exit_direction == MessageMoveDirection.TOP:			
+		if message_exit_direction == MessageMoveDirection.TOP:
 			exit_position_x = message.position.x
 			exit_position_y = 0 - message.size.y
 		elif message_exit_direction == MessageMoveDirection.BOTTOM:
